@@ -52,21 +52,20 @@ try
   % setpoints to the Nucleo firmware.
   robot.servo_jp(SERV_ID, [0,0,0]);
   pause(1);
+  %home pose
+  %robot.interpolate_jp(SERV_ID, [60,0,0], 5000);
+  %turn to 60 degree in 5s
+  robot.servo_jp(SERV_ID, [50,50,50]);
+  %pause(1);
+  for a=1:5
+      pause(0.1);
   robot.measured_js(1,1);
-
-  %robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+  end
+  %return matrix
   
-%   tic
-%     for a = 1:5
-    %pause(.1);
-  robot.measured_js(1,1);
-%     end
-  robot.interpolate_jp(SERV_ID, [60,0,0], 5000);
-
-  pause(.1);
-  robot.measured_js(1,1);
+  robot.setpoint_js();
   
-  %robot.setpoint_js();
+  robot.goal_js();
 catch exception
     getReport(exception)
     disp('Exited on error, clean shutdown');

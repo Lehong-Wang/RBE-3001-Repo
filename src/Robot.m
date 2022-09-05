@@ -39,15 +39,18 @@ classdef Robot < handle
             out = zeros(3,2,'single');
             if GETPOS
                 pos = self.read(1910);
-                out(1) = pos(3);
-                out(3) = pos(5);
-                out(5) = pos(7);
+                out(1,1) = pos(3);
+                out(2,1) = pos(5);
+                out(3,1) = pos(7);
             end 
             
             if GETVEL
                 pos = self.read(1822);
-                out(2) = pos(3);
-                out(4) = pos(6);
+%                 out(1,2) = pos(3);
+%                 out(2,2) = pos(6);
+%                 out(3,2) = pos(9);
+                out(4) = pos(3);
+                out(5) = pos(6);
                 out(6) = pos(9);
             end
             disp(out);
@@ -61,6 +64,16 @@ classdef Robot < handle
                 packet(1,2) = returnPacket(4);
                 packet(1,3) = returnPacket(5);
             disp(packet);
+        end
+
+        function packet = goal_js(self)
+            packet = zeros(1,3, 'single');
+            SERVER_ID_READ = 1848;
+            returnPacket = self.read(SERVER_ID_READ);
+            packet(1,1) = returnPacket(3);
+            packet(1,2) = returnPacket(4);
+            packet(1,3) = returnPacket(5);
+          disp(packet);
         end
 
         %The is a shutdown function to clear the HID hardware connection
