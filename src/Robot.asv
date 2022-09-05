@@ -16,7 +16,7 @@ classdef Robot < handle
             packet(3) = targets(1); % First link
             packet(4) = targets(2); % Second link
             packet(5) = targets(3); % Third link
-            %self.curr_goal = [packet(3),packet(4),packet(5)];
+            self.curr_goal = [packet(3),packet(4),packet(5)];
             % Write the packet
             self.write(SERV_ID, packet);
             return
@@ -29,14 +29,14 @@ classdef Robot < handle
             packet(3) = targets(1); % First link
             packet(4) = targets(2); % Second link
             packet(5) = targets(3); % Third link
-            %self.curr_goal = [packet(3),packet(4),packet(5)];
+            self.curr_goal = [packet(3),packet(4),packet(5)];
             % Write the packet
             self.write(SERV_ID, packet);
             return
         end
 
         function out = measured_js(self, GETPOS, GETVEL)
-            out = zeros(3,2,'single');
+            out = [0 0 0; 0 0 0];
             if GETPOS
                 pos = self.read(1910);
                 out(1) = pos(3);
@@ -50,17 +50,15 @@ classdef Robot < handle
                 out(4) = pos(6);
                 out(6) = pos(9);
             end
-            disp(out);
         end
 
-        function packet = setpoint_js(self)
-            packet = zeros(1, 3, 'single');
-                SERVER_ID_READ =1910;
-                returnPacket = self.read(SERVER_ID_READ);
-                packet(1,1) = returnPacket(3);
-                packet(1,2) = returnPacket(4);
-                packet(1,3) = returnPacket(5);
-            disp(packet);
+        function setpoisetpoint_js(self)
+            %disp('Angle setpoints');
+            temp_arr = self.read(1910);
+            setpoint1 = temp_arr(2);
+            setpoint2 = temp_arr(4);
+            setpoint3 = temp_arr(6);
+            setpoint_array = [setpoint1,setpoint2,setpoint3];
         end
 
         %The is a shutdown function to clear the HID hardware connection

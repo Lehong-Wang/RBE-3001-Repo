@@ -50,7 +50,7 @@ try
   % The following code generates a sinusoidal trajectory to be
   % executed on joint 1 of the arm and iteratively sends the list of
   % setpoints to the Nucleo firmware.
-  robot.servo_jp(SERV_ID, [0,0,0]);
+  robot.servo_jp(SERV_ID, [0,0,0],);
   pause(1);
   robot.measured_js(1,1);
 
@@ -58,10 +58,10 @@ try
   
 %   tic
 %     for a = 1:5
-    %pause(.1);
+    pause(.1);
   robot.measured_js(1,1);
 %     end
-  robot.interpolate_jp(SERV_ID, [60,0,0], 5000);
+  robot.interpolate_jp(SERV_ID, [50,0,0], 1000);
 
   pause(.1);
   robot.measured_js(1,1);
