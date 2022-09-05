@@ -8,13 +8,31 @@ classdef Robot < handle
     
     methods
         
+        function packet = setpoint_js(self)
+            packet = zeros(1, 3, 'single');
+                SERVER_ID_READ =1910;
+                returnPacket = self.read(SERVER_ID_READ);
+                packet(1,1) = returnPacket(3);
+                packet(1,2) = returnPacket(4);
+                packet(1,3) = returnPacket(5);
+            disp(packet);
+        end
+
         %The is a shutdown function to clear the HID hardware connection
         function  shutdown(self)
 	    %Close the device
             self.myHIDSimplePacketComs.disconnect();
         end
         
-        % Create a packet processor for an HID device with USB PID 0x007
+        % Create a packetfunction packet = setpoint_js(self)
+            packet = zeros(1, 3, 'single');
+                SERVER_ID_READ =1910;
+                returnPacket = self.read(SERVER_ID_READ);
+                packet(1,1) = returnPacket(3);
+                packet(1,2) = returnPacket(4);
+                packet(1,3) = returnPacket(5);
+            disp(packet);
+        end processor for an HID device with USB PID 0x007
         function self = Robot(dev)
              self.myHIDSimplePacketComs=dev; 
             self.pol = java.lang.Boolean(false);
