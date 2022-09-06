@@ -53,7 +53,7 @@ classdef Robot < handle
                 out(2,2) = pos(6);
                 out(2,3) = pos(9);
             end
-            disp(out);
+%             disp(out);
         end
 
         function packet = setpoint_js(self)
