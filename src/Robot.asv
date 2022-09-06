@@ -22,6 +22,60 @@ classdef Robot < handle
             return
         end
 
+        function interpolate_jp(self, SERV_ID, targets, time)
+            packet = zeros(15, 1, 'single');
+            packet(1) = time; % time in ms
+            packet(2) = 0; % linear interpolation
+            packet(3) = targets(1); % First link
+            packet(4) = targets(2); % Second link
+            packet(5) = targets(3); % Third link
+            %self.curr_goal = [packet(3),packet(4),packet(5)];
+            % Write the packet
+            self.write(SERV_ID, packet);
+            return
+        end
+
+        function out = measured_js(self, GETPOS, GETVEL)
+            out = zeros(2,3,'single');
+            if GETPOS
+                pos = self.read(1910);
+                out(1,1) = pos(3);
+                out(1,2) = pos(5);
+                out(,1) = pos(7);
+            end 
+            
+            if GETVEL
+                pos = self.read(1822);
+%                  out(1,2) = pos(3);
+%                 out(2,2) = pos(6);
+%                out(3,2) = pos(9);
+                out(4) = pos(3);
+                out(5) = pos(6);
+                out(6) = pos(9);
+            end
+            disp(out);
+        end
+
+        function packet = setpoint_js(self)
+            packet = zeros(1, 3, 'single');
+                SERVER_ID_READ =1910;
+                returnPacket = self.read(SERVER_ID_READ);
+                packet(1,1) = returnPacket(3);
+                packet(1,2) = returnPacket(4);
+                packet(1,3) = returnPacket(5);
+            disp(packet);
+        end
+
+        function packet = goal_js(self)
+            packet = zeros(1,3, 'single');
+            SERVER_ID_READ = 1848;
+            returnPacket = self.read(SERVER_ID_READ);
+            packet(1,1) = returnPacket(3);
+            packet(1,2) = returnPacket(4);
+            packet(1,3) = returnPacket(5);
+          disp(packet);
+        end
+
         %The is a shutdown function to clear the HID hardware connection
         function  shutdown(self)
 	    %Close the device
