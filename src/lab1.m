@@ -37,12 +37,12 @@ myHIDSimplePacketComs.connect();
 
 % Create a PacketProcessor object to send data to the nucleo firmware
 robot = Robot(myHIDSimplePacketComs); 
+SERV_ID = 1848;            % we will be talking to server ID 1848 on
+% the Nucleo
+SERVER_ID_READ =1910;% ID of the read packet
+DEBUG   = true;          % enables/disables debug prints
 try
-  SERV_ID = 1848;            % we will be talking to server ID 1848 on
-                           % the Nucleo
-  SERVER_ID_READ =1910;% ID of the read packet
-  DEBUG   = true;          % enables/disables debug prints
-  
+ 
   % Instantiate a packet - the following instruction allocates 60
   % bytes for this purpose. Recall that the HID interface supports
   % packet sizes up to 64 bytes.
@@ -66,6 +66,19 @@ try
   robot.setpoint_js();
   
   robot.goal_js();
+
+% 
+%   robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+%   pause(1);
+%   plot_graph(robot, SERV_ID, [50,50,50], 1000);
+
+
+
+
+
+
+
+
 catch exception
     getReport(exception)
     disp('Exited on error, clean shutdown');
@@ -75,3 +88,38 @@ end
 robot.shutdown()
 
 % toc
+
+function plot_graph(robot, SERV_ID, pos, time)
+    robot.interpolate_jp(SERV_ID, [0,0,0], time);
+    pause(1);
+
+    robot.interpolate_jp(SERV_ID, pos, time);
+    
+    data_tab = zeros(100,4);
+    i = 1;
+    tic
+    while toc < time/1000
+        pause(0.1);
+        time_stamp = toc;
+        disp(time_stamp);
+
+        measure_mat = robot.measured_js(1,0);
+        loc = transpose(measure_mat(:,1));
+        disp(loc);
+        data_tab(i,1) = time_stamp;
+        data_tab(i,2) = loc(1);
+        data_tab(i,3) = loc(2);
+        data_tab(i,4) = loc(3);
+        i = i+1;
+        
+
+    end
+    disp(data_tab)
+    plot(data_tab(:,1), data_tab(:,2));
+    writematrix(data_tab, 'Robot_data.csv');
+end
+
+
+
+
+
