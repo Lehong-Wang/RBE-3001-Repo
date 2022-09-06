@@ -28,12 +28,32 @@ try
     SERVER_ID_READ =1910;% ID of the read packet
     DEBUG   = true;          % enables/disables debug prints
 
-    packet = zeros(15, 1, 'single');
 
-    robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
-    pause(1);
+%     robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+%     pause(1);
+% 
+%     move_and_plot(robot, [45,0,0], 1000);
+% 
 
-    move_and_plot(robot, [45,0,0], 1000);
+
+    pos_mat = [-11.0400  -42.2600  -81.4900];
+%     [32.1600   87.3400  -51.7300]
+%                 -15.1200   74.1400   20.5100;
+%                 -60.4800   70.0600  -13.0900;
+%                 -11.0400  -42.2600  -81.4900];
+
+    for a = 1:height(pos_mat)
+        target_pos = pos_mat(a,:);
+        robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+        pause(1.2);
+        move_and_plot(robot, target_pos, 1000);
+        pause(1.2);
+        disp(a);
+    
+    end
+%     robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+
+
 
 
 
@@ -65,8 +85,7 @@ function move_and_plot(robot, targets, time)
         if mod(j,20) == 0
             status_mat = robot.measured_js(1,0);
             pos_mat = status_mat(1,:);
-            %         disp(current_time)
-            %         disp(pos_mat)
+
             tab_data(i,1) = current_time;
             tab_data(i,2) = pos_mat(1);
             tab_data(i,3) = pos_mat(2);
@@ -78,9 +97,9 @@ function move_and_plot(robot, targets, time)
         j = j + 1;
 
     end
-    disp(tab_data)
+%     disp(tab_data)
 
-    writematrix(tab_data, 'pos_data.csv'); 
+%     writematrix(tab_data, 'pos_data.csv'); 
     
     hold on
     plot(tab_data(:,1), tab_data(:,2));
@@ -88,36 +107,15 @@ function move_and_plot(robot, targets, time)
     plot(tab_data(:,1), tab_data(:,4));
     hold off
     legend({"Motor 1", "Motor 2", "Motor 3"});
-    
+    xlabel("Time (s)");
+    ylabel("Motor Position (deg)");
+    title("Robot Arm Position Against Time");
 
+   
 
-%     time_interval = 0.1;
-%     frequency_data = zeros(1,2);
 %     tab_data_time = tab_data(:,1);
 % 
-% 
-%     for t = (1:length(tab_data_time))
-%         current_t = tab_data_time(t);
-%         his_index = floor(current_t / time_interval)+1;
-%         try
-%             frequency_data(his_index) = frequency_data(his_index)+1;
-%         catch exception
-%             frequency_data(his_index) = 1;
-%         end
-%     end
-% 
-% 
-%     disp(frequency_data);
-%     time_interval_vector = 0:time_interval:(length(frequency_data)-1)*time_interval;
-% 
-% %     time_interval_vector = time_interval:time_interval:(length(frequency_data))*time_interval;
-% 
-% %     plot(time_interval_vector, frequency_data);
-    
-
-    tab_data_time = tab_data(:,1);
-
-    histogram(tab_data_time);
+%     histogram(tab_data_time);
 
 end
 
