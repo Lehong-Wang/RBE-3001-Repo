@@ -36,17 +36,20 @@ classdef Robot < handle
         end
 
         function out = measured_js(self, GETPOS, GETVEL)
-            out = zeros(3,2,'single');
+            out = zeros(2,3,'single');
             if GETPOS
                 pos = self.read(1910);
                 out(1,1) = pos(3);
-                out(2,1) = pos(5);
-                out(3,1) = pos(7);
+                out(1,2) = pos(5);
+                out(,1) = pos(7);
             end 
             
             if GETVEL
                 pos = self.read(1822);
-                out(1) = pos(3);
+%                  out(1,2) = pos(3);
+%                 out(2,2) = pos(6);
+%                out(3,2) = pos(9);
+                out(4) = pos(3);
                 out(5) = pos(6);
                 out(6) = pos(9);
             end
