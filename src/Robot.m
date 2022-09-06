@@ -9,6 +9,16 @@ classdef Robot < handle
     
     methods
 
+	function packet = goal_js(self)
+            packet = zeros(1,3, 'single');
+            SERVER_ID_READ = 1848;
+            returnPacket = self.read(SERVER_ID_READ);
+            packet(1,1) = returnPacket(3);
+            packet(1,2) = returnPacket(4);
+            packet(1,3) = returnPacket(5);
+          disp(packet);
+        end
+
 	function out = measured_js(self, GETPOS, GETVEL)
             out = zeros(2,3,'single');
             if GETPOS
@@ -70,15 +80,7 @@ classdef Robot < handle
             self.myHIDSimplePacketComs.disconnect();
         end
         
-        % Create a packetfunction packet = setpoint_js(self)
-            packet = zeros(1, 3, 'single');
-                SERVER_ID_READ =1910;
-                returnPacket = self.read(SERVER_ID_READ);
-                packet(1,1) = returnPacket(3);
-                packet(1,2) = returnPacket(4);
-                packet(1,3) = returnPacket(5);
-            disp(packet);
-        end processor for an HID device with USB PID 0x007
+        % Create a packet processor for an HID device with USB PID 0x007
         function self = Robot(dev)
              self.myHIDSimplePacketComs=dev; 
             self.pol = java.lang.Boolean(false);
