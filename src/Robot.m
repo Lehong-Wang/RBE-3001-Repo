@@ -8,18 +8,25 @@ classdef Robot < handle
     end
     
     methods
-
-	function packet = goal_js(self)
+    
+        % Returns  a  1x3  array  that  contains  the  end-of-motion  joint  
+        % setpoint  positions  in degrees.
+	    function packet = goal_js(self)
             packet = zeros(1,3, 'single');
             SERVER_ID_READ = 1848;
             returnPacket = self.read(SERVER_ID_READ);
             packet(1,1) = returnPacket(3);
             packet(1,2) = returnPacket(4);
             packet(1,3) = returnPacket(5);
-          disp(packet);
+            disp(packet);
         end
 
-	function out = measured_js(self, GETPOS, GETVEL)
+        % Which takes  two  boolean  values, named  GETPOS  and GETVEL. Only  
+        % return the  results  for the requested data, and set the rest to
+        % zero.
+        % Which returns a 2x3 array that contains current joint positions in degrees (1st row) and/or 
+        % current joint velocities (2nd row).
+	    function out = measured_js(self, GETPOS, GETVEL)
             out = zeros(2,3,'single');
             if GETPOS
                 pos = self.read(1910);
@@ -30,9 +37,6 @@ classdef Robot < handle
             
             if GETVEL
                 pos = self.read(1822);
-%                  out(1,2) = pos(3);
-%                 out(2,2) = pos(6);
-%                out(3,2) = pos(9);
                 out(2,1) = pos(3);
                 out(2,2) = pos(6);
                 out(2,3) = pos(9);
@@ -40,6 +44,7 @@ classdef Robot < handle
             disp(out);
         end
 
+        % takes a 1x3 array of joint values and an interpolation time in ms to get there 
         function interpolate_jp(self, SERV_ID, targets, time)
             packet = zeros(15, 1, 'single');
             packet(1) = time; % time in ms
@@ -47,30 +52,33 @@ classdef Robot < handle
             packet(3) = targets(1); % First link
             packet(4) = targets(2); % Second link
             packet(5) = targets(3); % Third link
+            % Write the packet
             self.write(SERV_ID, packet);
             return
         end
         
- 	function servo_jp(self, SERV_ID, targets)
+        % takes a 1x3 array of joint values in degrees to be sent directly to the actuators and 
+        % bypasses interpolation 
+ 	    function servo_jp(self, SERV_ID, targets)
             packet = zeros(15,1,'single');
             packet(1) = 0;
             packet(2) = 0;
             packet(3) = targets(1); % First link
             packet(4) = targets(2); % Second link
             packet(5) = targets(3); % Third link
-            %self.curr_goal = [packet(3),packet(4),packet(5)];
             % Write the packet
             self.write(SERV_ID, packet);
             return
         end
         
+        % Returns  a  1x3  array  that  contains  current  joint  set  point  positions  in  degrees.  
         function packet = setpoint_js(self)
             packet = zeros(1, 3, 'single');
-                SERVER_ID_READ =1910;
-                returnPacket = self.read(SERVER_ID_READ);
-                packet(1,1) = returnPacket(3);
-                packet(1,2) = returnPacket(4);
-                packet(1,3) = returnPacket(5);
+            SERVER_ID_READ =1910;
+            returnPacket = self.read(SERVER_ID_READ);
+            packet(1,1) = returnPacket(3);
+            packet(1,2) = returnPacket(4);
+            packet(1,3) = returnPacket(5);
             disp(packet);
         end
 
