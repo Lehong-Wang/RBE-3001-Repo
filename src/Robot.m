@@ -9,6 +9,27 @@ classdef Robot < handle
     
     methods
 
+	function out = measured_js(self, GETPOS, GETVEL)
+            out = zeros(2,3,'single');
+            if GETPOS
+                pos = self.read(1910);
+                out(1,1) = pos(3);
+                out(1,2) = pos(5);
+                out(1,3) = pos(7);
+            end 
+            
+            if GETVEL
+                pos = self.read(1822);
+%                  out(1,2) = pos(3);
+%                 out(2,2) = pos(6);
+%                out(3,2) = pos(9);
+                out(2,1) = pos(3);
+                out(2,2) = pos(6);
+                out(2,3) = pos(9);
+            end
+            disp(out);
+        end
+
         function interpolate_jp(self, SERV_ID, targets, time)
             packet = zeros(15, 1, 'single');
             packet(1) = time; % time in ms
@@ -20,7 +41,7 @@ classdef Robot < handle
             return
         end
         
-        function servo_jp(self, SERV_ID, targets)
+ 	function servo_jp(self, SERV_ID, targets)
             packet = zeros(15,1,'single');
             packet(1) = 0;
             packet(2) = 0;
@@ -32,7 +53,7 @@ classdef Robot < handle
             self.write(SERV_ID, packet);
             return
         end
-
+        
         %The is a shutdown function to clear the HID hardware connection
         function  shutdown(self)
 	    %Close the device
