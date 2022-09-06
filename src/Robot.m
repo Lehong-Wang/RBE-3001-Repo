@@ -8,6 +8,17 @@ classdef Robot < handle
     end
     
     methods
+
+        function interpolate_jp(self, SERV_ID, targets, time)
+            packet = zeros(15, 1, 'single');
+            packet(1) = time; % time in ms
+            packet(2) = 0; % linear interpolation
+            packet(3) = targets(1); % First link
+            packet(4) = targets(2); % Second link
+            packet(5) = targets(3); % Third link
+            self.write(SERV_ID, packet);
+            return
+        end
         
         function servo_jp(self, SERV_ID, targets)
             packet = zeros(15,1,'single');
