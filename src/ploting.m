@@ -31,9 +31,21 @@ try
     packet = zeros(15, 1, 'single');
     
     robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+    pause(1.5);
+
+    move_and_plot(robot, [45,0,0], 3000);    % Plot the movement of the arm
     pause(1);
 
-    move_and_plot(robot, [45,0,0], 1000);    % Plot the movement of the arm
+    robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+    pause(1.5);
+
+    move_and_plot(robot, [45,0,0], 3000);    % Plot the movement of the arm
+    pause(1);
+
+    robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+    pause(1.5);
+    move_and_plot(robot, [45,0,0], 3000);    % Plot the movement of the arm
+    pause(1);
 
 catch exception
     getReport(exception)
@@ -46,6 +58,7 @@ robot.shutdown();
 % Function to move the robot using interpolation and to plot the 
 % data in a graph and a .csv file
 function move_and_plot(robot, targets, time)
+    time=1;
     SERV_ID = 1848;          
     tab_data = zeros(10, 4);
 %     tab_row = zeros(1,4);
@@ -53,7 +66,7 @@ function move_and_plot(robot, targets, time)
     i = 1;
     j = 1;
     ploting_time = (time+500)/1000;
-    robot.interpolate_jp(SERV_ID, targets, time);   % Call interpolation function
+    robot.servo_jp(SERV_ID, targets);   % Call interpolation function
     
     tic     % Start the timer
     while current_time < ploting_time   
@@ -79,41 +92,29 @@ function move_and_plot(robot, targets, time)
     
     % Plot the data
     hold on
+    subplot(3,1,1);
     plot(tab_data(:,1), tab_data(:,2));
+    title("Motor 1");
+    xlabel("Time (s)");
+    ylabel("Motor Position (deg)");
+    legend(["First Run", "Second Run", "Third Run"]);
+
+    hold on
+    subplot(3,1,2);
     plot(tab_data(:,1), tab_data(:,3));
+    title("Motor 2");
+    xlabel("Time (s)");
+    ylabel("Motor Position (deg)");
+    legend(["First Run", "Second Run", "Third Run"]);
+
+    hold on
+    subplot(3,1,3);
     plot(tab_data(:,1), tab_data(:,4));
-    hold off
-    legend({"Motor 1", "Motor 2", "Motor 3"});
+    title("Motor 3");
+    xlabel("Time (s)");
+    ylabel("Motor Position (deg)");
+    legend(["First Run", "Second Run", "Third Run"]);
 
-    tab_data_time = tab_data(:,1);
-
-    % Create histogram using MATLAB function
-    histogram(tab_data_time);
-
-    % UNUSED CODE
-
-    %     time_interval = 0.1;
-%     frequency_data = zeros(1,2);
-%     tab_data_time = tab_data(:,1);
-% 
-% 
-%     for t = (1:length(tab_data_time))
-%         current_t = tab_data_time(t);
-%         his_index = floor(current_t / time_interval)+1;
-%         try
-%             frequency_data(his_index) = frequency_data(his_index)+1;
-%         catch exception
-%             frequency_data(his_index) = 1;
-%         end
-%     end
-% 
-% 
-%     disp(frequency_data);
-%     time_interval_vector = 0:time_interval:(length(frequency_data)-1)*time_interval;
-% 
-% %     time_interval_vector = time_interval:time_interval:(length(frequency_data))*time_interval;
-% 
-% %     plot(time_interval_vector, frequency_data);
 
 end
 
