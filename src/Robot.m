@@ -12,9 +12,10 @@ classdef Robot < handle
         % Returns  a  1x3  array  that  contains  the  end-of-motion  joint  
         % setpoint  positions  in degrees.
 	    function packet = goal_js(self)
-            packet = zeros(1,3, 'single');
-            SERVER_ID_READ = 1848;
-            returnPacket = self.read(SERVER_ID_READ);
+            packet = zeros(1,3, 'single');      % Initalize the matrix to zeros
+            SERVER_ID_READ = 1848; % Set Motor Setpoints with Time (Interpolation) packet ID
+            returnPacket = self.read(SERVER_ID_READ); % Read from Set Motor Setpoints with Time (Interpolation) packet
+            % Set corresponding packet data to correct matrix row
             packet(1,1) = returnPacket(3);
             packet(1,2) = returnPacket(4);
             packet(1,3) = returnPacket(5);
@@ -27,26 +28,28 @@ classdef Robot < handle
         % Which returns a 2x3 array that contains current joint positions in degrees (1st row) and/or 
         % current joint velocities (2nd row).
 	    function out = measured_js(self, GETPOS, GETVEL)
-            out = zeros(2,3,'single');
-            if GETPOS
-                pos = self.read(1910);
+            out = zeros(2,3,'single');  % Initalize matrix to zeros
+            if GETPOS   % If we want the position
+                pos = self.read(1910); % Read from Positions and Setpoint packet
+                % Set corresponding packet data to the matrix
                 out(1,1) = pos(3);
                 out(1,2) = pos(5);
                 out(1,3) = pos(7);
             end 
             
-            if GETVEL
-                pos = self.read(1822);
+            if GETVEL   % If we want the velocity
+                pos = self.read(1822); % Read from Velocity data packet
+                % Set corresponding packet data to the matrix
                 out(2,1) = pos(3);
                 out(2,2) = pos(6);
                 out(2,3) = pos(9);
             end
-%             disp(out);
+%             disp(out);    % Display the data
         end
 
         % takes a 1x3 array of joint values and an interpolation time in ms to get there 
         function interpolate_jp(self, SERV_ID, targets, time)
-            packet = zeros(15, 1, 'single');
+            packet = zeros(15, 1, 'single');        % Initalize matrix to zeros
             packet(1) = time; % time in ms
             packet(2) = 0; % linear interpolation
             packet(3) = targets(1); % First link
@@ -60,7 +63,8 @@ classdef Robot < handle
         % takes a 1x3 array of joint values in degrees to be sent directly to the actuators and 
         % bypasses interpolation 
  	    function servo_jp(self, SERV_ID, targets)
-            packet = zeros(15,1,'single');
+            packet = zeros(15,1,'single');      % Initalize matrix to zeros
+            % Set corresponding packet data to correct matrix row
             packet(1) = 0;
             packet(2) = 0;
             packet(3) = targets(1); % First link
@@ -73,13 +77,13 @@ classdef Robot < handle
         
         % Returns  a  1x3  array  that  contains  current  joint  set  point  positions  in  degrees.  
         function packet = setpoint_js(self)
-            packet = zeros(1, 3, 'single');
-            SERVER_ID_READ =1910;
-            returnPacket = self.read(SERVER_ID_READ);
+            packet = zeros(1, 3, 'single');     % Initalize matrix to zeros
+            SERVER_ID_READ = 1910; % Postions and Setpoint packet ID
+            returnPacket = self.read(SERVER_ID_READ); % Read from Postions and Setpoint packet
             packet(1,1) = returnPacket(3);
             packet(1,2) = returnPacket(4);
             packet(1,3) = returnPacket(5);
-            disp(packet);
+            disp(packet); % Display the data
         end
 
         %The is a shutdown function to clear the HID hardware connection
