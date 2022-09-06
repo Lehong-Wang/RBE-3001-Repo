@@ -41,7 +41,7 @@ classdef Robot < handle
                 out(2,2) = pos(6);
                 out(2,3) = pos(9);
             end
-            disp(out);
+%             disp(out);
         end
 
         % takes a 1x3 array of joint values and an interpolation time in ms to get there 
