@@ -29,13 +29,11 @@ try
     DEBUG   = true;          % enables/disables debug prints
 
     packet = zeros(15, 1, 'single');
-
+    
     robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
     pause(1);
 
-    move_and_plot(robot, [45,0,0], 1000);
-
-
+    move_and_plot(robot, [45,0,0], 1000);    % Plot the movement of the arm
 
 catch exception
     getReport(exception)
@@ -45,53 +43,56 @@ end
 % Clear up memory upon termination
 robot.shutdown();
 
-
-
-
-
+% Function to move the robot using interpolation and to plot the 
+% data in a graph and a .csv file
 function move_and_plot(robot, targets, time)
     SERV_ID = 1848;          
-    SERVER_ID_READ =1910;
     tab_data = zeros(10, 4);
 %     tab_row = zeros(1,4);
     current_time = 0;
     i = 1;
     j = 1;
     ploting_time = (time+500)/1000;
-    robot.interpolate_jp(SERV_ID, targets, time);
+    robot.interpolate_jp(SERV_ID, targets, time);   % Call interpolation function
     
-    tic
-    while current_time < ploting_time
+    tic     % Start the timer
+    while current_time < ploting_time   
         if mod(j,20) == 0
             status_mat = robot.measured_js(1,0);
             pos_mat = status_mat(1,:);
             %         disp(current_time)
             %         disp(pos_mat)
+            % Add the data to the matrix
             tab_data(i,1) = current_time;
             tab_data(i,2) = pos_mat(1);
             tab_data(i,3) = pos_mat(2);
             tab_data(i,4) = pos_mat(3);
-            i = i + 1;
-            current_time = toc;
-
+            i = i + 1;      % Increment the index
+            current_time = toc;     % Set current time
         end
         j = j + 1;
 
     end
-    disp(tab_data)
+    disp(tab_data)      % Display the matrix
 
-    writematrix(tab_data, 'pos_data.csv'); 
+    writematrix(tab_data, 'pos_data.csv');      % Write the data to the .csv file
     
+    % Plot the data
     hold on
     plot(tab_data(:,1), tab_data(:,2));
     plot(tab_data(:,1), tab_data(:,3));
     plot(tab_data(:,1), tab_data(:,4));
     hold off
     legend({"Motor 1", "Motor 2", "Motor 3"});
-    
 
+    tab_data_time = tab_data(:,1);
 
-%     time_interval = 0.1;
+    % Create histogram using MATLAB function
+    histogram(tab_data_time);
+
+    % UNUSED CODE
+
+    %     time_interval = 0.1;
 %     frequency_data = zeros(1,2);
 %     tab_data_time = tab_data(:,1);
 % 
@@ -113,11 +114,6 @@ function move_and_plot(robot, targets, time)
 % %     time_interval_vector = time_interval:time_interval:(length(frequency_data))*time_interval;
 % 
 % %     plot(time_interval_vector, frequency_data);
-    
-
-    tab_data_time = tab_data(:,1);
-
-    histogram(tab_data_time);
 
 end
 
