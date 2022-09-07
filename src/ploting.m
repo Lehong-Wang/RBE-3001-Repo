@@ -33,19 +33,8 @@ try
     robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
     pause(1.5);
 
-    move_and_plot(robot, [45,0,0], 3000);    % Plot the movement of the arm
-    pause(1);
-
-    robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+    move_and_plot(robot, [45,0,0], 1000);    % Plot the movement of the arm
     pause(1.5);
-
-    move_and_plot(robot, [45,0,0], 3000);    % Plot the movement of the arm
-    pause(1);
-
-    robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
-    pause(1.5);
-    move_and_plot(robot, [45,0,0], 3000);    % Plot the movement of the arm
-    pause(1);
 
 catch exception
     getReport(exception)
@@ -58,7 +47,6 @@ robot.shutdown();
 % Function to move the robot using interpolation and to plot the 
 % data in a graph and a .csv file
 function move_and_plot(robot, targets, time)
-    time=1;
     SERV_ID = 1848;          
     tab_data = zeros(10, 4);
 %     tab_row = zeros(1,4);
@@ -88,32 +76,24 @@ function move_and_plot(robot, targets, time)
     end
     disp(tab_data)      % Display the matrix
 
-    writematrix(tab_data, 'pos_data.csv');      % Write the data to the .csv file
-    
-    % Plot the data
-    hold on
-    subplot(3,1,1);
-    plot(tab_data(:,1), tab_data(:,2));
-    title("Motor 1");
-    xlabel("Time (s)");
-    ylabel("Motor Position (deg)");
-    legend(["First Run", "Second Run", "Third Run"]);
+    tab_data_time = tab_data(:,1);
+    collection_time_tab = zeros(5,1);
+    collection_time_tab(1) = 0.001;
+    for a = (2:length(tab_data_time))
+        collection_time_tab(a) = tab_data_time(a) - tab_data_time(a-1);
+    end
 
-    hold on
-    subplot(3,1,2);
-    plot(tab_data(:,1), tab_data(:,3));
-    title("Motor 2");
+    % Create histogram using MATLAB function
+    histogram(collection_time_tab); 
+    title("Data Collection Time");
     xlabel("Time (s)");
-    ylabel("Motor Position (deg)");
-    legend(["First Run", "Second Run", "Third Run"]);
+    ylabel("Number of Data Collected");
 
-    hold on
-    subplot(3,1,3);
-    plot(tab_data(:,1), tab_data(:,4));
-    title("Motor 3");
-    xlabel("Time (s)");
-    ylabel("Motor Position (deg)");
-    legend(["First Run", "Second Run", "Third Run"]);
+    disp(mean(collection_time_tab))
+    disp(median(collection_time_tab))
+    disp(max(collection_time_tab))
+    disp(min(collection_time_tab))
+
 
 
 end
