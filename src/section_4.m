@@ -31,9 +31,21 @@ try
     packet = zeros(15, 1, 'single');
     
     robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+    pause(1.5);
+    move_and_plot(robot, [45,0,0], 1000, "non-interpulate_1.csv");    % Plot the movement of the arm
     pause(1);
 
-    move_and_plot(robot, [45,0,0], 1000);    % Plot the movement of the arm
+    robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+    pause(1.5);
+    move_and_plot(robot, [45,0,0], 1000, "non-interpulate_2.csv");    % Plot the movement of the arm
+    pause(1);    
+    
+    
+    robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+    pause(1.5);
+    move_and_plot(robot, [45,0,0], 1000, "non-interpulate_3.csv");    % Plot the movement of the arm
+    pause(1);
+
 
 catch exception
     getReport(exception)
@@ -45,7 +57,7 @@ robot.shutdown();
 
 % Function to move the robot using interpolation and to plot the 
 % data in a graph and a .csv file
-function move_and_plot(robot, targets, time)
+function move_and_plot(robot, targets, time, name)
     SERV_ID = 1848;          
     tab_data = zeros(10, 4);
 %     tab_row = zeros(1,4);
@@ -53,7 +65,7 @@ function move_and_plot(robot, targets, time)
     i = 1;
     j = 1;
     ploting_time = (time+500)/1000;
-    robot.interpolate_jp(SERV_ID, targets, time);   % Call interpolation function
+    robot.servo_jp(SERV_ID, targets);   % Call interpolation function
     
     tic     % Start the timer
     while current_time < ploting_time   
@@ -75,45 +87,28 @@ function move_and_plot(robot, targets, time)
     end
     disp(tab_data)      % Display the matrix
 
-    writematrix(tab_data, 'pos_data.csv');      % Write the data to the .csv file
-    
-    % Plot the data
-    hold on
-    plot(tab_data(:,1), tab_data(:,2));
-    plot(tab_data(:,1), tab_data(:,3));
-    plot(tab_data(:,1), tab_data(:,4));
-    hold off
-    legend({"Motor 1", "Motor 2", "Motor 3"});
+    writematrix(tab_data, name); 
 
-    tab_data_time = tab_data(:,1);
 
-    % Create histogram using MATLAB function
-    histogram(tab_data_time);
-
-    % UNUSED CODE
-
-    %     time_interval = 0.1;
-%     frequency_data = zeros(1,2);
 %     tab_data_time = tab_data(:,1);
-% 
-% 
-%     for t = (1:length(tab_data_time))
-%         current_t = tab_data_time(t);
-%         his_index = floor(current_t / time_interval)+1;
-%         try
-%             frequency_data(his_index) = frequency_data(his_index)+1;
-%         catch exception
-%             frequency_data(his_index) = 1;
-%         end
+%     collection_time_tab = zeros(5,1);
+%     collection_time_tab(1) = 0.001;
+%     for a = (2:length(tab_data_time))
+%         collection_time_tab(a) = tab_data_time(a) - tab_data_time(a-1);
 %     end
 % 
+%     % Create histogram using MATLAB function
+%     histogram(collection_time_tab); 
+%     title("Data Collection Time");
+%     xlabel("Time (s)");
+%     ylabel("Number of Data Collected");
 % 
-%     disp(frequency_data);
-%     time_interval_vector = 0:time_interval:(length(frequency_data)-1)*time_interval;
-% 
-% %     time_interval_vector = time_interval:time_interval:(length(frequency_data))*time_interval;
-% 
-% %     plot(time_interval_vector, frequency_data);
+%     disp(mean(collection_time_tab))
+%     disp(median(collection_time_tab))
+%     disp(max(collection_time_tab))
+%     disp(min(collection_time_tab))
+
+
 
 end
 
