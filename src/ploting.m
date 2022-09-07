@@ -32,9 +32,20 @@ try
     
     robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
     pause(1.5);
+    move_and_plot(robot, [45,0,0], 1000, "non-interpulate_1.csv");    % Plot the movement of the arm
+    pause(1);
 
-    move_and_plot(robot, [45,0,0], 1000);    % Plot the movement of the arm
+    robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
     pause(1.5);
+    move_and_plot(robot, [45,0,0], 1000, "non-interpulate_2.csv");    % Plot the movement of the arm
+    pause(1);    
+    
+    
+    robot.interpolate_jp(SERV_ID, [0,0,0], 1000);
+    pause(1.5);
+    move_and_plot(robot, [45,0,0], 1000, "non-interpulate_3.csv");    % Plot the movement of the arm
+    pause(1);
+
 
 catch exception
     getReport(exception)
@@ -46,7 +57,7 @@ robot.shutdown();
 
 % Function to move the robot using interpolation and to plot the 
 % data in a graph and a .csv file
-function move_and_plot(robot, targets, time)
+function move_and_plot(robot, targets, time, name)
     SERV_ID = 1848;          
     tab_data = zeros(10, 4);
 %     tab_row = zeros(1,4);
@@ -76,23 +87,26 @@ function move_and_plot(robot, targets, time)
     end
     disp(tab_data)      % Display the matrix
 
-    tab_data_time = tab_data(:,1);
-    collection_time_tab = zeros(5,1);
-    collection_time_tab(1) = 0.001;
-    for a = (2:length(tab_data_time))
-        collection_time_tab(a) = tab_data_time(a) - tab_data_time(a-1);
-    end
+    writematrix(tab_data, name); 
 
-    % Create histogram using MATLAB function
-    histogram(collection_time_tab); 
-    title("Data Collection Time");
-    xlabel("Time (s)");
-    ylabel("Number of Data Collected");
 
-    disp(mean(collection_time_tab))
-    disp(median(collection_time_tab))
-    disp(max(collection_time_tab))
-    disp(min(collection_time_tab))
+%     tab_data_time = tab_data(:,1);
+%     collection_time_tab = zeros(5,1);
+%     collection_time_tab(1) = 0.001;
+%     for a = (2:length(tab_data_time))
+%         collection_time_tab(a) = tab_data_time(a) - tab_data_time(a-1);
+%     end
+% 
+%     % Create histogram using MATLAB function
+%     histogram(collection_time_tab); 
+%     title("Data Collection Time");
+%     xlabel("Time (s)");
+%     ylabel("Number of Data Collected");
+% 
+%     disp(mean(collection_time_tab))
+%     disp(median(collection_time_tab))
+%     disp(max(collection_time_tab))
+%     disp(min(collection_time_tab))
 
 
 
