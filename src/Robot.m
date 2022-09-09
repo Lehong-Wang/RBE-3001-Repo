@@ -3,8 +3,8 @@ classdef Robot < handle
     properties
         myHIDSimplePacketComs;
         pol; 
-        GRIPPER_ID = 1962
-        curr_goal = zeros(1,3)
+        GRIPPER_ID = 1962;
+        SERV_ID = 1848; 
     end
     
     methods
@@ -48,7 +48,7 @@ classdef Robot < handle
         end
 
         % takes a 1x3 array of joint values and an interpolation time in ms to get there 
-        function interpolate_jp(self, SERV_ID, targets, time)
+        function interpolate_jp(self, targets, time)
             packet = zeros(15, 1, 'single');        % Initalize matrix to zeros
             packet(1) = time; % time in ms
             packet(2) = 0; % linear interpolation
@@ -56,13 +56,13 @@ classdef Robot < handle
             packet(4) = targets(2); % Second link
             packet(5) = targets(3); % Third link
             % Write the packet
-            self.write(SERV_ID, packet);
+            self.write(self.SERV_ID, packet);
             return
         end
         
         % takes a 1x3 array of joint values in degrees to be sent directly to the actuators and 
         % bypasses interpolation 
- 	    function servo_jp(self, SERV_ID, targets)
+ 	    function servo_jp(self, targets)
             packet = zeros(15,1,'single');      % Initalize matrix to zeros
             % Set corresponding packet data to correct matrix row
             packet(1) = 0;
@@ -71,7 +71,7 @@ classdef Robot < handle
             packet(4) = targets(2); % Second link
             packet(5) = targets(3); % Third link
             % Write the packet
-            self.write(SERV_ID, packet);
+            self.write(self.SERV_ID, packet);
             return
         end
         
