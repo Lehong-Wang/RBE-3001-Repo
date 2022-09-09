@@ -22,7 +22,16 @@ classdef Robot < handle
             pos_rad = arrayfun(@(x) deg2rad(x), pos);
             T = Matrix.fk3001(pos_rad);
             disp(pos);
+        end
 
+        % takes data from setpoint_js() and returns a 4x4 homogeneous transformation 
+        % matrix based upon the current joint set point positions in degrees.
+        function T = setpoint_cp(self)
+        end
+           
+        %  takes  data  from  goal_js()  and  returns  a  4x4  homogeneous  transformation 
+        % matrix based upon the commanded end of motion joint set point positions in degrees.  
+        function T = goal_cp(self)
         end
 
 
