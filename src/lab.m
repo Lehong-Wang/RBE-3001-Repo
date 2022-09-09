@@ -26,6 +26,8 @@ try
   SERV_ID = 1848;
   SERVER_ID_READ =1910;
   
+  a = robot.measured_js(1,1)
+  b = robot.measured_cp()
 
  
 

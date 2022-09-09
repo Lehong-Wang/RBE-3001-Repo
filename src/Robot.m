@@ -5,10 +5,39 @@ classdef Robot < handle
         pol; 
         GRIPPER_ID = 1962;
         SERV_ID = 1848; 
+        matrix = Matrix();
     end
-    
+%     matrix = Matrix();
+
     methods
     
+
+% ######################################## Lab 2 Functions ########################################
+
+        % return transformation matrix of base to tip
+        function T = measured_cp(self)
+            status_tab = self.measured_js(1,0);
+            pos = status_tab(1,:);
+            % turn degree to radians
+            pos_rad = arrayfun(@(x) deg2rad(x), pos);
+            T = Matrix.fk3001(pos_rad);
+            disp(pos);
+
+        end
+
+
+
+
+
+
+
+
+
+
+
+% ######################################## Lab 1 Functions ########################################
+
+
         % Returns  a  1x3  array  that  contains  the  end-of-motion  joint  
         % setpoint  positions  in degrees.
 	    function packet = goal_js(self)
@@ -86,6 +115,14 @@ classdef Robot < handle
             disp(packet); % Display the data
         end
 
+
+
+
+
+% ######################################## Default Functions ########################################
+
+
+
         %The is a shutdown function to clear the HID hardware connection
         function  shutdown(self)
 	    %Close the device
@@ -94,7 +131,7 @@ classdef Robot < handle
         
         % Create a packet processor for an HID device with USB PID 0x007
         function self = Robot(dev)
-             self.myHIDSimplePacketComs=dev; 
+            self.myHIDSimplePacketComs=dev;
             self.pol = java.lang.Boolean(false);
         end
         
