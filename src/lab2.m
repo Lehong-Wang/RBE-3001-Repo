@@ -53,7 +53,7 @@ try
   robot.servo_jp(SERV_ID, [0,0,0]);
   pause(1);
   %home pose
-  robot.interpolate_jp(SERV_ID, [40,40,40], 3000);
+  robot.interpolate_jp([40,40,40], 3000);
   pause(1);
   %turn to 60 degree in 5s
   %robot.servo_jp(SERV_ID, [50,50,50]);
