@@ -28,7 +28,7 @@ try
   
 %   a = robot.measured_js(1,1)
 %   b = robot.measured_cp()
-  robot.servo_jp([40,0,0]);
+  robot.servo_jp([40,50,-20]);
   c = robot.setpoint_js()
   d = robot.setpoint_cp()
   e = robot.goal_cp()
