@@ -21,10 +21,24 @@ classdef Robot < handle
             % turn degree to radians
             pos_rad = arrayfun(@(x) deg2rad(x), pos);
             T = Matrix.fk3001(pos_rad);
-            disp(pos);
+%             disp(pos);
 
         end
 
+        function T = setpoint_cp(self)
+            set_tab = self.setpoint_js();
+            set_rad = arrayfun(@(x) deg2rad(x), set_tab);
+            T = Matrix.fk3001(set_rad);
+%             disp(set_rad);
+        end
+
+
+        function T = goal_cp(self)
+            goal_tab = self.goal_js();
+            goal_rad = arrayfun(@(x) deg2rad(x), goal_tab);
+            T = Matrix.fk3001(goal_rad);
+%             disp(goal_rad);
+        end
 
 
 
@@ -107,12 +121,14 @@ classdef Robot < handle
         % Returns  a  1x3  array  that  contains  current  joint  set  point  positions  in  degrees.  
         function packet = setpoint_js(self)
             packet = zeros(1, 3, 'single');     % Initalize matrix to zeros
-            SERVER_ID_READ = 1910; % Postions and Setpoint packet ID
-            returnPacket = self.read(SERVER_ID_READ); % Read from Postions and Setpoint packet
-            packet(1,1) = returnPacket(3);
-            packet(1,2) = returnPacket(4);
-            packet(1,3) = returnPacket(5);
-            disp(packet); % Display the data
+            SERVER_ID_READ = 1848; % Setpoint packet ID
+            returnPacket = self.read(SERVER_ID_READ) % Read from Postions and Setpoint packet
+            packet(1) = returnPacket(3);
+            packet(2) = returnPacket(4);
+            packet(3) = returnPacket(5);
+%             disp("Packet HERE");
+%             disp(packet); % Display the data
+%             disp("END");
         end
 
 
