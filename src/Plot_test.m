@@ -43,17 +43,17 @@
 % hold off
 % pause(1);
 % 
-% 
-% X = [1,2,6];
-% Y = [2,4,6];
-% Z = [3,2,1];
-% 
-% plot3(X,Y,Z)
-% pause(1);
-% hold on
-% plot3(X,Y,Z.*sin(X),'.')
-% hold off
-% 
+
+X = [1,2,6];
+Y = [2,4,6];
+Z = [3,2,1];
+
+plot3(X,Y,Z)
+pause(1);
+hold on
+plot3(X,Y,Z.*sin(X),'.')
+hold off
+
 
 
 % clear all;clc

@@ -5,7 +5,7 @@ classdef Robot < handle
         pol; 
         GRIPPER_ID = 1962;
         SERV_ID = 1848; 
-        matrix = Matrix();
+%         matrix = Matrix();
     end
 %     matrix = Matrix();
 
@@ -40,6 +40,16 @@ classdef Robot < handle
 %             disp(goal_rad);
         end
 
+        % return a position matrix of the joints
+        % helper for ploting
+        % format: [ link_0_x   link_0_y    link_0_z
+        %           link_1_x    link_1_y    link_1_z
+        %           ...
+        function T = get_all_pos(self)
+            T = zeros(1,4);
+            T_1 = Matrix.fk3001()
+
+        end
 
 
 
