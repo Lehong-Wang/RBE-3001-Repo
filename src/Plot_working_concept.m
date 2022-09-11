@@ -1,6 +1,6 @@
 
 
-function [plot_pos, make_plot] = Plot2
+function [plot_pos, make_plot] = Plot_working_concept
     plot_pos = @plot_pos
     make_plot = @make_plot
 end

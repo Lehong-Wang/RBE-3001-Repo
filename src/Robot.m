@@ -40,14 +40,26 @@ classdef Robot < handle
 %             disp(goal_rad);
         end
 
-        % return a position matrix of the joints
+        % return all transformation matrix of the joints
         % helper for ploting
-        % format: [ link_0_x   link_0_y    link_0_z
-        %           link_1_x    link_1_y    link_1_z
-        %           ...
-        function T = get_all_pos(self)
-            T = zeros(1,4);
-            T_1 = Matrix.fk3001()
+        % should be 4*4*n matrix (n=4)
+        function T = get_all_trans_mat(self)
+            T_0 = zeros(4);
+            status_tab = self.measured_js(1,0);
+            joint_angle = status_tab(1,:);
+            % turn degree to radians
+            pos_rad = arrayfun(@(x) deg2rad(x), joint_angle);
+            T_1 = Matrix.fk3001(zeros(0));
+            T_2 = Matrix.fk3001(pos_rad(1));
+            T_3 = Matrix.fk3001(pos_rad(1:2));
+            T_4 = Matrix.fk3001(pos_rad(1:3));
+
+            T(:,:,1) = T_0;
+            T(:,:,2) = T_1;
+            T(:,:,3) = T_2;
+            T(:,:,4) = T_3;
+            T(:,:,5) = T_4;
+
 
         end
 

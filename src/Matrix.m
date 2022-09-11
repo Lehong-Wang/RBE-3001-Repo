@@ -53,7 +53,11 @@ classdef Matrix
             %     disp(t_matrix_array);
 
             matrix_dim = size(t_matrix_array);
-            depth = matrix_dim(3);
+            if length(matrix_dim) == 2
+                depth = 1;
+            else
+                depth = matrix_dim(3);
+            end
 
             for i = (1:depth)
                 T = T * t_matrix_array(:,:,i);
@@ -68,23 +72,26 @@ classdef Matrix
             % base to joint 1
             dh_tab(1,:) = [0 55 0 0];
 
-            for i = (1:length(pos))
-                % enter the robot structure
-                if i == 1
-                    joint_dh = [pos(1) 40 0 -pi/2];
-                elseif i == 2
-                    joint_dh = [pos(2)-pi/2 0 100 0];
-                elseif i == 3
-                    joint_dh = [pos(3)+pi/2 0 100 0];
-                else
-                    joint_dh = [pos(i) 0 100 0];
+            if length(pos) == 0
+                T = Matrix.dh2fk(dh_tab);
+            else
+                for i = (1:length(pos))
+                    % enter the robot structure
+                    if i == 1
+                        joint_dh = [pos(1) 40 0 -pi/2];
+                    elseif i == 2
+                        joint_dh = [pos(2)-pi/2 0 100 0];
+                    elseif i == 3
+                        joint_dh = [pos(3)+pi/2 0 100 0];
+                    else
+                        joint_dh = [pos(i) 0 100 0];
+                    end
+                    % first row is T_0_1
+                    dh_tab(i+1,:) = joint_dh;
                 end
-                % first row is T_0_1
-                dh_tab(i+1,:) = joint_dh;
+    %             disp(dh_tab);
+                T = Matrix.dh2fk(dh_tab);
             end
-%             disp(dh_tab);
-            T = Matrix.dh2fk(dh_tab);
-
         end
 
     end
