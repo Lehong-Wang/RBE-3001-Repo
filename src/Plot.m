@@ -30,7 +30,7 @@ function make_plot
     plot_dot.YDataSource = 'base_plot_y';
     plot_dot.ZDataSource = 'base_plot_z';
 
-    assignin('base','base_plot_line',plot_line);
+%     assignin('base','base_plot_line',plot_line);
 end
 
 
