@@ -62,7 +62,7 @@ try
   %robot.setpoint_js();
   for a=1:5
       pause(0.1);
-  robot.measured_js(1,1);
+  robot.measured_cp();
   end
   %return matrix
   

@@ -23,12 +23,29 @@ myHIDSimplePacketComs.connect();
 
 robot = Robot(myHIDSimplePacketComs); 
 try
-  SERV_ID = 1848;
-  SERVER_ID_READ =1910;
+    SERV_ID = 1848;
+    SERVER_ID_READ =1910;
   
-  a = robot.measured_js(1,1)
-  b = robot.measured_cp()
+%   a = robot.measured_js(1,1)
+%   b = robot.measured_cp()
+%   robot.servo_jp([40,50,-20]);
+%   c = robot.setpoint_js()
+%   d = robot.setpoint_cp()
+%   e = robot.goal_cp()
 
+
+    [make_plot, plot_pos, plot_arm] = Model;
+
+    make_plot();
+    for i = (1:100)
+        t_mat = robot.get_all_trans_mat()
+        plot_arm(t_mat)
+        pause(.1);
+    end
+
+
+
+    
  
 
 
