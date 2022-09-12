@@ -1,6 +1,6 @@
 
 
-function [make_plot, plot_pos, plot_arm] = Plot
+function [make_plot, plot_pos, plot_arm] = Model
     make_plot = @make_plot
     plot_pos = @plot_pos
     plot_arm = @plot_arm
