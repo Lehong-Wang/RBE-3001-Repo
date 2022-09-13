@@ -11,8 +11,8 @@ classdef Matrix
 %             dh2mat = @dh2mat;
 %             dh2fk = @dh2fk;
 %             fk3001 = @fk3001;
-% 
-% 
+%
+%
 %         end
 
         % dh2mat([1,2,3,4]);
@@ -21,9 +21,9 @@ classdef Matrix
         end
 
 
-        % takes in a 1x4 array corresponding to a row of the DH parameter table for 
+        % takes in a 1x4 array corresponding to a row of the DH parameter table for
         % given link. Then generates the associated intermediate transformation and returns
-        % a corresponding symbolic 4x4 homogeneous transformation matrix. 
+        % a corresponding symbolic 4x4 homogeneous transformation matrix.
         function T = dh2mat(dh_parameter)
             dh_cell = num2cell(dh_parameter);
             [theta, d, a, alpha] = dh_cell{:};
@@ -41,9 +41,9 @@ classdef Matrix
 
 
 
-        % takes in an nx4 array corresponding to the n rows of  the  full  
-        % DH  parameter  table.  Then  generates  a  corresponding  symbolic  4x4 
-        % homogeneous  transformation  matrix  for  the  composite  transformation. 
+        % takes in an nx4 array corresponding to the n rows of  the  full
+        % DH  parameter  table.  Then  generates  a  corresponding  symbolic  4x4
+        % homogeneous  transformation  matrix  for  the  composite  transformation.
         function T = dh2fk(dh_array)
             % init a 2D matrix, which will later be 3D
             t_matrix_array = zeros(4);
@@ -70,9 +70,10 @@ classdef Matrix
 
         end
 
+        % array of joint angles starting from base
         % takes n joint configurations as inputs in the form of an nx1 vector (i.e. your
-        % three joint angles). It should return a 4x4 homogeneous transformation matrix  
-        % representing the position and orientation of the tip frame with respect to the base frame 
+        % three joint angles). It should return a 4x4 homogeneous transformation matrix
+        % representing the position and orientation of the tip frame with respect to the base frame
         function T = fk3001(joint_config)
             pos = joint_config;
             dh_tab = zeros(1,4);
@@ -103,4 +104,3 @@ classdef Matrix
 
     end
 end
-
