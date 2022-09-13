@@ -85,7 +85,7 @@ function make_plot
     plot_axis_z.WDataSource = 'base_plot_wz';
 %     assignin('base','base_plot_line',plot_line);
 
-
+    plot_workspace();
 
 end
 
@@ -203,11 +203,11 @@ end
 function plot_workspace()
 
     [x,y,z] = sphere;      %# Makes a 21-by-21 point sphere
-    x = x(7:end,:);       %# Keep top 11 x points
-    y = y(7:end,:);       %# Keep top 11 y points
-    z = z(7:end,:);       %# Keep top 11 z points
+    x = x(5:end,:);       %# Keep top 11 x points
+    y = y(5:end,:);       %# Keep top 11 y points
+    z = z(5:end,:);       %# Keep top 11 z points
     r = 200;                 %# A radius value
-    surf(r.*x,r.*y,r.*z+55);  %# Plot the surface
+    surf(r.*x,r.*y,r.*z+95);  %# Plot the surface
 %     axis equal;            %# Make the scaling on the x, y, and z axes equal
 end
 
