@@ -5,7 +5,7 @@ classdef Robot < handle
         pol; 
         GRIPPER_ID = 1962;
         SERV_ID = 1848; 
-%         matrix = Matrix();
+        matrix = Matrix();
     end
 %     matrix = Matrix();
 
@@ -24,51 +24,9 @@ classdef Robot < handle
             disp(pos);
         end
 
-        % takes data from setpoint_js() and returns a 4x4 homogeneous transformation 
-        % matrix based upon the current joint set point positions in degrees.
-       
-           
-        %  takes  data  from  goal_js()  and  returns  a  4x4  homogeneous  transformation 
-        % matrix based upon the commanded end of motion joint set point positions in degrees.  
-        
-
-        function T = setpoint_cp(self)
-            set_tab = self.setpoint_js();
-            set_rad = arrayfun(@(x) deg2rad(x), set_tab);
-            T = Matrix.fk3001(set_rad);
-%             disp(set_rad);
-        end
+        function
 
 
-        function T = goal_cp(self)
-            goal_tab = self.goal_js();
-            goal_rad = arrayfun(@(x) deg2rad(x), goal_tab);
-            T = Matrix.fk3001(goal_rad);
-%             disp(goal_rad);
-        end
-
-        % return all transformation matrix of the joints
-        % helper for ploting
-        % should be 4*4*n matrix (n=4)
-        function T = get_all_trans_mat(self)
-            T_0 = zeros(4);
-            status_tab = self.measured_js(1,0);
-            joint_angle = status_tab(1,:);
-            % turn degree to radians
-            pos_rad = arrayfun(@(x) deg2rad(x), joint_angle);
-            T_1 = Matrix.fk3001(zeros(0));
-            T_2 = Matrix.fk3001(pos_rad(1));
-            T_3 = Matrix.fk3001(pos_rad(1:2));
-            T_4 = Matrix.fk3001(pos_rad(1:3));
-
-            T(:,:,1) = T_0;
-            T(:,:,2) = T_1;
-            T(:,:,3) = T_2;
-            T(:,:,4) = T_3;
-            T(:,:,5) = T_4;
-
-
-        end
 
 
 
@@ -150,14 +108,12 @@ classdef Robot < handle
         % Returns  a  1x3  array  that  contains  current  joint  set  point  positions  in  degrees.  
         function packet = setpoint_js(self)
             packet = zeros(1, 3, 'single');     % Initalize matrix to zeros
-            SERVER_ID_READ = 1848; % Setpoint packet ID
-            returnPacket = self.read(SERVER_ID_READ) % Read from Postions and Setpoint packet
-            packet(1) = returnPacket(3);
-            packet(2) = returnPacket(4);
-            packet(3) = returnPacket(5);
-%             disp("Packet HERE");
-%             disp(packet); % Display the data
-%             disp("END");
+            SERVER_ID_READ = 1910; % Postions and Setpoint packet ID
+            returnPacket = self.read(SERVER_ID_READ); % Read from Postions and Setpoint packet
+            packet(1,1) = returnPacket(3);
+            packet(1,2) = returnPacket(4);
+            packet(1,3) = returnPacket(5);
+            disp(packet); % Display the data
         end
 
 

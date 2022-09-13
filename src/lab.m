@@ -21,11 +21,11 @@ myHIDSimplePacketComs.setPid(pid);
 myHIDSimplePacketComs.setVid(vid);
 myHIDSimplePacketComs.connect();
 
-robot = Robot(myHIDSimplePacketComs); 
+robot = Robot(myHIDSimplePacketComs);
 try
     SERV_ID = 1848;
     SERVER_ID_READ =1910;
-  
+
 %   a = robot.measured_js(1,1)
 %   random_pos = robot.measured_cp()
 %   robot.servo_jp([40,50,-20]);
@@ -47,8 +47,8 @@ try
 
 
 
-    
- 
+
+
 
 
 
