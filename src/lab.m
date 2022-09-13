@@ -34,7 +34,8 @@ try
 %   e = robot.goal_cp()
 
 
-    [make_plot, plot_pos, plot_arm] = Model;
+    
+[make_plot, plot_pos, plot_arm] = Model;
 
     make_plot();
     for i = (1:100)
