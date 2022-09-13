@@ -65,7 +65,7 @@ classdef Matrix
 
         end
 
-
+        % array of joint angles starting from base
         function T = fk3001(joint_config)
             pos = joint_config;
             dh_tab = zeros(1,4);
