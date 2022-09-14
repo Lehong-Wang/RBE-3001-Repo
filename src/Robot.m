@@ -11,6 +11,19 @@ classdef Robot < handle
 
     methods
     
+% ######################################## Lab 3 Functions ########################################
+        % takes a 3x1 task space position vector (i.e. x, y, z components of pBaseTip that 
+        % is the robot end-effector’s position w.r.t the base frame) as the input and returns a set
+        % of corresponding joint angles (i.e. q1, q2, q3) that would make the robot’s end-effector 
+        % move to that target position. 
+        function T = ik3001()
+        end
+        
+        % Takes two arguments, trajectory coefficients and the total maount
+        % of time the trajector should take
+        function T = run_trajectory(coeff, duration)
+        end
+
 
 % ######################################## Lab 2 Functions ########################################
 
@@ -26,12 +39,6 @@ classdef Robot < handle
 
         % takes data from setpoint_js() and returns a 4x4 homogeneous transformation 
         % matrix based upon the current joint set point positions in degrees.
-       
-           
-        %  takes  data  from  goal_js()  and  returns  a  4x4  homogeneous  transformation 
-        % matrix based upon the commanded end of motion joint set point positions in degrees.  
-        
-
         function T = setpoint_cp(self)
             set_tab = self.setpoint_js();
             set_rad = arrayfun(@(x) deg2rad(x), set_tab);
@@ -39,7 +46,8 @@ classdef Robot < handle
 %             disp(set_rad);
         end
 
-
+        %  takes  data  from  goal_js()  and  returns  a  4x4  homogeneous  transformation 
+        % matrix based upon the commanded end of motion joint set point positions in degrees.  
         function T = goal_cp(self)
             goal_tab = self.goal_js();
             goal_rad = arrayfun(@(x) deg2rad(x), goal_tab);
@@ -69,13 +77,6 @@ classdef Robot < handle
 
 
         end
-
-
-
-
-
-
-
 
 
 % ######################################## Lab 1 Functions ########################################
