@@ -16,7 +16,13 @@ classdef Robot < handle
         % is the robot end-effector’s position w.r.t the base frame) as the input and returns a set
         % of corresponding joint angles (i.e. q1, q2, q3) that would make the robot’s end-effector 
         % move to that target position. 
-        function T = ik3001()
+        function T = ik3001(matrix)
+            % Figure out what q1, q2, q3 are
+            q1 = atan2(0);
+            q2 = atan2(0);
+            q3 = atan2(0);
+            T = [q1 q2 q3];
+            disp(T);
         end
         
         % Takes two arguments, trajectory coefficients and the total maount
