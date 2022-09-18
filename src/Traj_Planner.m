@@ -5,8 +5,7 @@ classdef Traj_Planner < handle
     end
 
     methods
-        function self = Traj_Planner(robot)
-            self.robot = robot;
+        function self = Traj_Planner()
         end
         
         % Solves for a cubic(3rd order) polynomial trajectory between two
@@ -17,8 +16,8 @@ classdef Traj_Planner < handle
                  0,   1,  2*t0,  3*t0^2;
                  1,  tf,  tf^2,    tf^3;
                  0,   1,  2*tf,  3*tf^2];
-            Given = [q0, vel0, qf, velf];
-            T = inv(M)*Given;
+            Given = [q0; vel0; qf; velf];
+            T = transpose(inv(M)*Given);
         end
         
     end

@@ -8,6 +8,9 @@ classdef Robot < handle
         SERVER_ID_READ =1910;
         VEL_ID = 1822;
         GRIPPER_ID = 1962
+        timeStamps = [0];
+        actualJointAngle = [];
+        jointAngleByCal = [];
     end
     
     methods
@@ -104,6 +107,7 @@ classdef Robot < handle
         end
 
       
+        % input array that contains angle value for each joint
         function servo_jp(packet, positionArray)
             packet.write(packet.SERV_ID, [0; 0; positionArray.'; zeros(15, 1)] );
             packet.jointSetpointGoal = positionArray;
@@ -254,7 +258,7 @@ classdef Robot < handle
             if z < 0 || z > 295
                 error("Error: invalid z input");
             end
-            if x > 180
+            if x > 165
                 error("Error: invalid x input");
             end 
             if y > 200 || y < -200
@@ -295,6 +299,47 @@ classdef Robot < handle
             returnT = [theta1; theta2; theta3];
  
         end
+
+        % command the robot arm to go from one point to the other point
+        % based on the input trajectory coefficients between two points 
+        % (3x4 matrix)
+        % the robot arm is moved along the triangle trajectory in advance
+        % to get the time between each vertice; which can be input into the
+        % cubic_traj() to get trajectory Coefficients and the totalTime;
+        % bassically it alows the robot to go exat same trajectory as the
+        % previous one with calculated coefficient
+        function run_trajectory(self, trajectoryCoefficients, totalTime)
+            xa0 = trajectoryCoefficients(1,1);
+            xa1 = trajectoryCoefficients(1,2);
+            xa2 = trajectoryCoefficients(1,3);
+            xa3 = trajectoryCoefficients(1,4);
+            ya0 = trajectoryCoefficients(2,1);
+            ya1 = trajectoryCoefficients(2,2);
+            ya2 = trajectoryCoefficients(2,3);
+            ya3 = trajectoryCoefficients(2,4);
+            za0 = trajectoryCoefficients(3,1);
+            za1 = trajectoryCoefficients(3,2);
+            za2 = trajectoryCoefficients(3,3);
+            za3 = trajectoryCoefficients(3,4);
+            lastTimestamps = self.timeStamps(end);
+
+            tStart = tic;
+            t = toc(tStart);
+            while t < totalTime
+                t = toc(tStart);
+                self.timeStamps = [self.timeStamps;t+lastTimestamps];
+                currentJointPoseX = xa0 + xa1*t + xa2*t^2 + xa3*t^3;
+                currentJointPoseY = ya0 + ya1*t + ya2*t^2 + ya3*t^3;
+                currentJointPoseZ = za0 + za1*t + za2*t^2 + za3*t^3;
+                currentJointPose = [currentJointPoseX, currentJointPoseY, currentJointPoseZ];
+                self.servo_jp(currentJointPose);
+                actualJs = self.measured_js(1, 0);
+                self.actualJointAngle = [self.actualJointAngle; actualJs(1,:)];
+                self.jointAngleByCal = [self.jointAngleByCal; currentJointPose];
+                
+            end
+            
+        end 
 
 
         
