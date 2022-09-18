@@ -73,7 +73,8 @@ classdef Matrix
         % three joint angles). It should return a 4x4 homogeneous transformation matrix
         % representing the position and orientation of the tip frame with respect to the base frame
         function T = fk3001(joint_config)
-            pos = joint_config;
+%             new_array = arrayfun(@(x) function_name(x), array_to_map);
+            pos = arrayfun(@(x) deg2rad(x), joint_config);
             dh_tab = zeros(1,4);
             % base to joint 1
             dh_tab(1,:) = [0 55 0 0];
@@ -99,6 +100,136 @@ classdef Matrix
                 T = Matrix.dh2fk(dh_tab);
             end
         end
+
+
+        function T = hard_code(q1, q2, q3)
+            ct1 = cos(q1)
+            st1 = sin(q1)
+            ct2 = cos(q2)
+            st2 = cos(q2)
+            ct3 = cos(q3)
+            st3 = cos(q3)
+            returnFM = [ ct1*st2*st3 - ct1*-ct2*ct3,    - ct1*st2*ct3 - ct1*st3*-ct2,       -st1,   100*ct1*st2 + 100*ct1*st2*st3 - 100*ct1*-ct2*ct3;
+                         st1*st2*st3 - st1*-ct2*ct3,    - st1*st2*ct3 - st1*st3*-ct2,       ct1,    100*st1*st2 + 100*st1*st2*st3 - 100*st1*-ct2*ct3;
+                         - st2*ct3 - st3*-ct2,          -ct2*ct3 - st2*st3,                 0,      95 - 100*st2*ct3 - 100*st3*-ct2 - 100*-ct2;
+                         0,                             0,                                  0,      1];
+            T = returnFM
+        end
+
+
+
+
+        function I = ik3001(pos)
+
+            a1 = 100;
+            a2 = 100; 
+            d1 = 95;
+            x = pos(1);
+            y = pos(2);
+            z = pos(3);
+            r = sqrt((x^2) + (y^2));
+            s = z - d1;
+
+            Matrix.check_in_work_space(x,y,z);
+%             in_workspace = Matrix.check_in_work_space(x,y,z);
+%             if  ~in_workspace
+%                 return
+%             end
+
+            D1 = x/r;
+            C1 = sqrt(1 - (D1^2));
+            theta1 = atan2(y,x);
+
+            alpha = atan2(s,r);
+            D2 = ((a1^2) + (r^2) + (s^2)- (a2^2)) / (2*a1*(sqrt((r^2) + (s^2))));
+
+            C2 = -(sqrt(1 - (D2^2)));
+            beta = atan2(C2,D2);
+            theta2 = pi/2 - (alpha - beta);
+
+            D3 = -((a1^2) + (a2^2) - ((r^2) + (s^2)))/(2*a1*a2);
+            C3 = sqrt(1 - (D3^2));
+            theta3 =  (atan2(C3,D3))- pi/2;
+
+            if theta2 <= -pi/2 || theta2 >= pi/2
+                theta2 = pi/2 - (alpha - (atan2(-C2, D2))); % safety checks for angles 2 and 3
+            end
+            if theta3 <= -pi/2 || theta3 >= pi/2
+                theta3 = atan2(-C3, D3) - pi/2;
+            end
+
+            I = [theta1, theta2, theta3]; 
+            I = I * (360/(2*pi));
+
+        end
+
+
+
+
+        
+        
+        
+        function in_work_space = check_in_work_space(x, y, z)
+        
+            if z<0
+                in_work_space = false;
+                error("ERROR: Z axis less than 0");
+            end
+            % outer sphere formed by arm length
+            % all things below are already bounded by this
+            if (x^2 + y^2 + (z-95)^2) > 200^2
+                in_work_space = false;
+                error('ERROR: NOT in work space! \nArm not long enough');
+            end
+            % bottom part, limited by base joint 
+            % x > 0 and dig out 50 mm for base joint
+            if (z >= 0 && z <= 95)
+                if x<0
+                    in_work_space = false;
+                    error("ERROR: NOT in work space! \nJoint 1 limitation [90, -90] (bottom)");
+                end
+                if x^2+y^2 < 50^2
+                    in_work_space = false;
+                    error("ERROR: NOT in work space! \nMay hit base joint");
+                end
+                in_work_space = true;
+                return
+            end
+            % middle part, limited by joint 2 -45 deg range
+            % x > 0 and dig out link 3
+            if (z > 95 && z <= 95+100*2^0.5)
+                if x<0
+                    in_work_space = false;
+                    error("ERROR: NOT in work space! \nJoint 1 limitation [90, -90] (middle)");
+                end
+                if sqrt(x^2+y^2) < sqrt(100^2-(z-195)^2)-50*2^0.5
+                    in_work_space = false;
+                    error("ERROR: NOT in work space! \nJoint 2 limitation [90, -45] (middle)");
+                end
+                in_work_space = true;
+                return
+            end
+            % top part, limited by joint 2 -45 deg range
+            % x > 0 all good, x < 0 dig out top of link 3
+            if (z > 95+100*2^0.5 && z <= 195+50*2^0.5)
+                disp(sqrt(x^2+y^2))
+                if x<0 && sqrt(x^2+y^2) > 50*2^0.5-sqrt(100^2-(z-195)^2) && sqrt(x^2+y^2) < 50*2^0.5+sqrt(100^2-(z-195)^2)
+                   in_work_space = false;
+                    error("ERROR: NOT in work space! \nJoint 2 limitation [90, -45] (top)");
+                end 
+                in_work_space = true;
+                return
+            end
+            % top top part
+            % all good
+            if (z > 195+50*2^0.5)
+                in_work_space = true;
+                return
+            end
+        end
+
+
+
 
     end
 end
