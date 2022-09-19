@@ -24,57 +24,31 @@ myHIDSimplePacketComs.connect();
 robot = Robot(myHIDSimplePacketComs); 
 model2 = Model2();
 traj = Traj_Planner();
-
-%{ 
-% Code to get the time duration for each edge of the triangle 
-robot.interpolate_jp([52.991 42.8602 -31.7898], 1000)
-pause(5)
-
-tStart = tic;
-startTime = toc(tStart);
-while true
-currentAngle = robot.measured_js(1, 0);
-currentX = currentAngle(1,1);
-robot.servo_jp([-37.68 51.58 -42.13])
-if currentX <= -37.6 
-    endTime = toc(tStart);
-    disp(endTime)
-end
-end 
-%}
 %--------------------------------------------------------------------------
 
-% apply run_trajectory func to actuate robot arm follow the triangle
+% calculate the trajectory coefficient based on position
 % arm get to P1 in advance of trajectory
 robot.interpolate_jp([-37.68, 51.58, -42.13], 1000)
 pause(2)
 
 % P1-P2
-% calculate the trajectory coefficient
-T1_2_1 = traj.cubic_traj(0, 2, 0, 0, -37.68, 0.72);
-T1_2_2 = traj.cubic_traj(0, 2, 0, 0, 51.58, 50.62);
-T1_2_3 = traj.cubic_traj(0, 2, 0, 0, -42.13, -3.25);
-TC1 = [T1_2_1; T1_2_2; T1_2_3];
-
-robot.run_trajectory(TC1, 2, 1);
-
+TP1_2_1 = traj.cubic_traj(0, 2, 0, 0, 140.0769, 145.0102);
+TP1_2_2 = traj.cubic_traj(0, 2, 0, 0, -108.1856, 1.8223);
+TP1_2_3 = traj.cubic_traj(0, 2, 0, 0, 140.7234, 84.8718);
+TPC1 = [TP1_2_1; TP1_2_2; TP1_2_3];
+robot.run_trajectory(TPC1, 2, 0);
 % P2-P3
-% calculate the trajectory coefficient
-T2_3_1 = traj.cubic_traj(2, 4, 0, 0, 0.72, 52.9991);
-T2_3_2 = traj.cubic_traj(2, 4, 0, 0, 50.62, 42.8602);
-T2_3_3 = traj.cubic_traj(2, 4, 0, 0, -3.25, -31.7898);
-TC2 = [T2_3_1; T2_3_2; T2_3_3];
-
-robot.run_trajectory(TC2, 2, 1);
-
+TP2_3_1 = traj.cubic_traj(2, 4, 0, 0, 145.0102, 100);
+TP2_3_2 = traj.cubic_traj(2, 4, 0, 0, 1.8223, 132.7);
+TP2_3_3 = traj.cubic_traj(2, 4, 0, 0, 84.8718, 149.1);
+TPC2 = [TP2_3_1; TP2_3_2; TP2_3_3];
+robot.run_trajectory(TPC2, 2, 0);
 % P3-P1
-% calculate the trajectory coefficient
-T3_1_1 = traj.cubic_traj(4, 6, 0, 0, 52.9991, -37.68);
-T3_1_2 = traj.cubic_traj(4, 6, 0, 0, 42.8602, 51.58);
-T3_1_3 = traj.cubic_traj(4, 6, 0, 0, -31.7898, -42.13);
-TC3 = [T3_1_1; T3_1_2; T3_1_3];
-
-robot.run_trajectory(TC3, 2, 1);
+TP3_1_1 = traj.cubic_traj(4, 6, 0, 0, 100, 140.0769);
+TP3_1_2 = traj.cubic_traj(4, 6, 0, 0, 132.7, -108.1856);
+TP3_1_3 = traj.cubic_traj(4, 6, 0, 0, 149.1, 140.7234);
+TPC3 = [TP3_1_1; TP3_1_2; TP3_1_3];
+robot.run_trajectory(TPC3, 2, 0);
 %--------------------------------------------------------------------------
 
 % plotting end effector position vs. time
@@ -104,25 +78,6 @@ ylabel("End effector position(mm)")
 title("End Effector position vs. Time")
 legend("X axis","Y axis", "Z axis")
 %--------------------------------------------------------------------------
-
-% plotting velociy along each axis vs. time
-% calculate the trajectory coefficient based on position
-TP1_2_1 = traj.cubic_traj(0, 2, 0, 0, 140.0769, 145.0102);
-TP1_2_2 = traj.cubic_traj(0, 2, 0, 0, -108.1856, 1.8223);
-TP1_2_3 = traj.cubic_traj(0, 2, 0, 0, 140.7234, 84.8718);
-TPC1 = [TP1_2_1; TP1_2_2; TP1_2_3];
-% P2-P3
-% calculate the trajectory coefficient based on position
-TP2_3_1 = traj.cubic_traj(2, 4, 0, 0, 145.0102, 100);
-TP2_3_2 = traj.cubic_traj(2, 4, 0, 0, 1.8223, 132.7);
-TP2_3_3 = traj.cubic_traj(2, 4, 0, 0, 84.8718, 149.1);
-TPC2 = [TP2_3_1; TP2_3_2; TP2_3_3];
-% P3-P1
-% calculate the trajectory coefficient based on position
-TP3_1_1 = traj.cubic_traj(4, 6, 0, 0, 100, 140.0769);
-TP3_1_2 = traj.cubic_traj(4, 6, 0, 0, 132.7, -108.1856);
-TP3_1_3 = traj.cubic_traj(4, 6, 0, 0, 149.1, 140.7234);
-TPC3 = [TP3_1_1; TP3_1_2; TP3_1_3];
 
 figure
 % use for loop to get the time boundary of 0-2, 2-4, 4-6
@@ -174,7 +129,6 @@ title("Velocity along each axis vs. Time")
 xlabel("Time(s)");
 ylabel("velocity along each axis(mm/s)");
 legend("X axis", "Y axis", "Z axis");
-
 %--------------------------------------------------------------------------
 
 % plotting for the accelaration
@@ -210,7 +164,7 @@ title("Accelerations along each axis vs. Time")
 xlabel("Time(s)");
 ylabel("Accelerations along each axis(mm/s^2)");
 legend("X axis", "Y axis", "Z axis");
-%---------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 
 % plot 3d trajectory
 figure
@@ -219,14 +173,11 @@ axis([100 180 -100 100 80 150])
 title("3D Position Trajectory");
 xlabel('X-Position');
 ylabel('Y-Position');
-zlabel('Z-Position');
+zlabel('Z-Position');  
 
 %--------------------------------------------------------------------------
 % store posArray into a csv file
-writematrix(robot.posArray, 'joint_space_posArray.csv')
-
-
-
+writematrix(robot.posArray, 'task_space_posArray.csv')
 
 
 

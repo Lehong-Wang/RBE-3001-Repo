@@ -11,6 +11,7 @@ classdef Robot < handle
         timeStamps = [0];
         actualJointAngle = [];
         jointAngleByCal = [];
+        posArray = [];
     end
     
     methods
@@ -258,7 +259,7 @@ classdef Robot < handle
             if z < 0 || z > 295
                 error("Error: invalid z input");
             end
-            if x > 165
+            if x > 180
                 error("Error: invalid x input");
             end 
             if y > 200 || y < -200
@@ -308,7 +309,8 @@ classdef Robot < handle
         % cubic_traj() to get trajectory Coefficients and the totalTime;
         % bassically it alows the robot to go exat same trajectory as the
         % previous one with calculated coefficient
-        function run_trajectory(self, trajectoryCoefficients, totalTime)
+        function run_trajectory(self, trajectoryCoefficients, totalTime, ifJointSpace)
+
             xa0 = trajectoryCoefficients(1,1);
             xa1 = trajectoryCoefficients(1,2);
             xa2 = trajectoryCoefficients(1,3);
@@ -325,17 +327,27 @@ classdef Robot < handle
 
             tStart = tic;
             t = toc(tStart);
-            while t < totalTime
+            while t < totalTime+lastTimestamps
                 t = toc(tStart);
                 self.timeStamps = [self.timeStamps;t+lastTimestamps];
+                t = t+lastTimestamps;
                 currentJointPoseX = xa0 + xa1*t + xa2*t^2 + xa3*t^3;
                 currentJointPoseY = ya0 + ya1*t + ya2*t^2 + ya3*t^3;
                 currentJointPoseZ = za0 + za1*t + za2*t^2 + za3*t^3;
                 currentJointPose = [currentJointPoseX, currentJointPoseY, currentJointPoseZ];
-                self.servo_jp(currentJointPose);
-                actualJs = self.measured_js(1, 0);
-                self.actualJointAngle = [self.actualJointAngle; actualJs(1,:)];
+
+                if ~ifJointSpace
+                    currentJointPose = transpose(self.ik3001(currentJointPose));
+                end
+                
+                self.servo_jp(currentJointPose); % actuate the robot arm to the target value
+                actualJs = self.measured_js(1, 0); % measure the joint angle value, return a 2x3 matrix
+                self.actualJointAngle = [self.actualJointAngle; actualJs(1,:)]; % store the first row of actualJs to actualJointAngle
                 self.jointAngleByCal = [self.jointAngleByCal; currentJointPose];
+
+                actualPos = self.fk3001(actualJs(1,:));
+                self.posArray = [self.posArray; transpose(actualPos(1:3, 4))];
+
                 
             end
             
