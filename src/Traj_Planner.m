@@ -13,8 +13,8 @@ classdef Traj_Planner
                        0    1   2*t0    3*t0.^2;
                        1    tf  tf.^2    tf.^3;
                        0    1   2*tf    3*tf.^2; ];
-            B = [q0 v0 qf vf];
-            X = mtimes(B,matrix*(-1));
+            B = [q0; v0; qf; vf];
+            X = mtimes(inv(matrix), B);
             disp(X);
         end
         
@@ -30,8 +30,8 @@ classdef Traj_Planner
                         1   tf  tf.^2   tf.^3     tf.^4        tf.^5;
                         0   1   2*tf   3*tf.^2   4*tf.^3      5*tf.^4;
                         0   0   2      6*tf     12*tf.^2     20*tf.^3; ];
-             B = [q0 v0 a0 qf vf af];
-             X = mtimes(B,matrix*(-1));
+             B = [q0; v0; a0; qf; vf; af];
+             X = mtimes(inv(matrix), B);
              disp(X);
         end
     end
