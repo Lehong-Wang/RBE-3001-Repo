@@ -10,6 +10,19 @@ classdef Robot < handle
 %     matrix = Matrix();
 
     methods
+
+% ######################################## Lab 4 Functions ########################################
+        % takes your configuration q (i.e. all of the current joint angles at the time 
+        % the function is run) and returns the corresponding numeric 6 by 3 Jacobian matrix.
+        function T = jacob3001(q)
+            q1 = q(1);
+            q2 = q(2);
+            q3 = q(3);
+            L0 = 55;
+            L1 = 40;
+            L2 = 100;
+            L3 = 100;
+        end
     
 % ######################################## Lab 3 Functions ########################################
         % takes a 3x1 task space position vector (i.e. x, y, z components of pBaseTip that 
