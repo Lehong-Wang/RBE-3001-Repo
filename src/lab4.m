@@ -21,7 +21,7 @@ myHIDSimplePacketComs.setVid(vid);
 myHIDSimplePacketComs.connect();
 
 % Create a PacketProcessor object to send data to the nucleo firmware
-pp = Robot(myHIDSimplePacketComs); 
+robot = Robot(myHIDSimplePacketComs); 
 traj = Traj_Planner();
 try
   SERV_ID = 1848;            % we will be talking to server ID 1848 on
@@ -35,7 +35,7 @@ try
   packet = zeros(15, 1, 'single');
   
   
-  J = pp.jacob3001([0 90 -90])
+  J = robot.jacob3001([0 90 -90])
   disp(det(J(1:3,:)));
   
   
@@ -48,44 +48,44 @@ try
 
 i = 1; % counts iterations
 prevEndpoint = [-500; -500; -500; -500]; %initialize variable to impossible values so it never overlaps
-AV = pp.measured_js(1,1); 
+AV = robot.measured_js(1,1); 
 fkAngle = transpose(AV(1, :));
 qVelocity = AV(2,:);
-endpoint = pp.fk3001(fkAngle)* [0; 0; 0; 1];
+endpoint = robot.fk3001(fkAngle)* [0; 0; 0; 1];
 
 tic
 while toc < 7
     
-    if ~(pp.finished_movement(transpose(endpoint(1:3,1)), Pos2)) && (toc <= 2)
+    if ~(robot.finished_movement(transpose(endpoint(1:3,1)), Pos2)) && (toc <= 2)
       
         x12traj = traj.linear_traj(Pos1(1,1), Pos2(1,1), 0, 2, toc);  
         y12traj = traj.linear_traj(Pos1(1,2), Pos2(1,2), 0, 2, toc);
         z12traj = traj.linear_traj(Pos1(1,3), Pos2(1,3), 0, 2, toc);
-        pp.interpolate_jp(pp.ik3001([x12traj, y12traj, z12traj]),1000);
+        robot.interpolate_jp(robot.ik3001([x12traj, y12traj, z12traj]),1000);
       
-    elseif ~(pp.finished_movement(transpose(endpoint(1:3,1)), Pos3)) && toc > 2 && toc < 4
+    elseif ~(robot.finished_movement(transpose(endpoint(1:3,1)), Pos3)) && toc > 2 && toc < 4
 
         x23traj = traj.linear_traj(Pos2(1,1), Pos3(1,1), 2, 4, toc);
         y23traj = traj.linear_traj(Pos2(1,2), Pos3(1,2), 2, 4, toc);
         z23traj = traj.linear_traj(Pos2(1,3), Pos3(1,3), 2, 4, toc);
-        pp.interpolate_jp(pp.ik3001([x23traj, y23traj, z23traj]),1000);
+        robot.interpolate_jp(robot.ik3001([x23traj, y23traj, z23traj]),1000);
             
-    elseif ~(pp.finished_movement(transpose(endpoint(1:3,1)), Pos1)) && toc > 4 && toc < 6
+    elseif ~(robot.finished_movement(transpose(endpoint(1:3,1)), Pos1)) && toc > 4 && toc < 6
       
         x31traj = traj.linear_traj(Pos3(1,1), Pos1(1,1), 4, 6, toc);
         y31traj = traj.linear_traj(Pos3(1,2), Pos1(1,2), 4, 6, toc);
         z31traj = traj.linear_traj(Pos3(1,3), Pos1(1,3), 4, 6, toc);  
-        pp.interpolate_jp(pp.ik3001([x31traj, y31traj, z31traj]),1000);
+        robot.interpolate_jp(robot.ik3001([x31traj, y31traj, z31traj]),1000);
    
     end
     
-    AV = pp.measured_js(1,1);
+    AV = robot.measured_js(1,1);
     fkAngle = transpose(AV(1, :));
     qVelocity = transpose(AV(2,:));
-    endpoint = pp.fk3001(fkAngle)* [0; 0; 0; 1];
-    ee_jacob = pp.jacob3001(fkAngle);
+    endpoint = robot.fk3001(fkAngle)* [0; 0; 0; 1];
+    ee_jacob = robot.jacob3001(fkAngle);
     ee_velocity = ee_jacob(1:3,1:3)*qVelocity;
-    pp.plot_arm(fkAngle,ee_velocity)
+    robot.plot_arm(fkAngle,ee_velocity)
     
     if(prevEndpoint(1,1) ~= endpoint(1,1) || prevEndpoint(2,1) ~= endpoint(2,1) || prevEndpoint(3,1) ~= endpoint(3,1) && 0 ~= endpoint(1,1) && 0 ~= endpoint(2,1) && 0 ~= endpoint(3,1))
         lin_traj_m(i, 1) = toc;
@@ -161,6 +161,6 @@ legend('Scalar Linear Velocity');
 end
 
 % Clear up memory upon termination
-pp.shutdown()
+robot.shutdown()
 
 % tozc
