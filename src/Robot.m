@@ -309,7 +309,7 @@ classdef Robot < handle
         % cubic_traj() to get trajectory Coefficients and the totalTime;
         % bassically it alows the robot to go exat same trajectory as the
         % previous one with calculated coefficient
-        function run_trajectory(self, trajectoryCoefficients, totalTime, ifJointSpace)
+        function run_trajectory(self, t0, t, ifJointSpace)
 
             xa0 = trajectoryCoefficients(1,1);
             xa1 = trajectoryCoefficients(1,2);
