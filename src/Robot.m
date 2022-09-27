@@ -14,15 +14,55 @@ classdef Robot < handle
 % ######################################## Lab 4 Functions ########################################
         % takes your configuration q (i.e. all of the current joint angles at the time 
         % the function is run) and returns the corresponding numeric 6 by 3 Jacobian matrix.
-        function T = jacob3001(q)
-            q1 = q(1);
-            q2 = q(2);
-            q3 = q(3);
-            L0 = 55;
-            L1 = 40;
-            L2 = 100;
-            L3 = 100;
+%         function T = jacob3001(q)
+%             q1 = q(1);
+%             q2 = q(2);
+%             q3 = q(3);
+%             L0 = 55;
+%             L1 = 40;
+%             L2 = 100;
+%             L3 = 100;
+%         end
+
+        function J = jacob3001(self, theta)
+                theta = theta*pi/180;
+                J11 = 100*sin(theta(1))*sin(theta(2) - pi/2)*sin(theta(3) + pi/2) - 100*cos(theta(2) - pi/2)*cos(theta(3) + pi/2)*sin(theta(1)) - 100*cos(theta(2) - pi/2)*sin(theta(1));
+                J21 = 100*cos(theta(1))*cos(theta(2) - pi/2) + 100*cos(theta(1))*cos(theta(2) - pi/2)*cos(theta(3) + pi/2) - 100*cos(theta(1))*sin(theta(2) - pi/2)*sin(theta(3) + pi/2);
+                J31 = 0;
+                
+                J12 = - 100*cos(theta(1))*sin(theta(2) - pi/2) - 100*cos(theta(1))*cos(theta(2) - pi/2)*sin(theta(3) + pi/2) - 100*cos(theta(1))*cos(theta(3) + pi/2)*sin(theta(2) - pi/2);
+                J22 = - 100*sin(theta(1))*sin(theta(2) - pi/2) - 100*cos(theta(2) - pi/2)*sin(theta(1))*sin(theta(3) + pi/2) - 100*cos(theta(3) + pi/2)*sin(theta(1))*sin(theta(2) - pi/2);
+                J32 = 100*sin(theta(2) - pi/2)*sin(theta(3) + pi/2) - 100*cos(theta(2) - pi/2)*cos(theta(3) + pi/2) - 100*cos(theta(2) - pi/2);
+                
+                J13 = - 100*cos(theta(1))*cos(theta(2) - pi/2)*sin(theta(3) + pi/2) - 100*cos(theta(1))*cos(theta(3) + pi/2)*sin(theta(2) - pi/2);
+                J23 = - 100*cos(theta(2) - pi/2)*sin(theta(1))*sin(theta(3) + pi/2) - 100*cos(theta(3) + pi/2)*sin(theta(1))*sin(theta(2) - pi/2);
+                J33 = 100*sin(theta(2) - pi/2)*sin(theta(3) + pi/2) - 100*cos(theta(2) - pi/2)*cos(theta(3) + pi/2);
+                
+                J41 = 0;
+                J51 = 0;
+                J61 = 1;
+                
+                J42 = -sin(theta(1));
+                J52 = cos(theta(1));
+                J62 = 0;
+                
+                J43 = -sin(theta(1));
+                J53 = cos(theta(1));
+                J63 = 0;
+                
+                J = [J11 J12 J13;
+                    J21 J22 J23;
+                    J31 J32 J33;
+                    J41 J42 J43;
+                    J51 J52 J53;
+                    J61 J62 J63;];
+%                 disp(J);
         end
+
+        function PD = fdk3001(self, thata, d)
+                PD = self.jacob3001(thata)*d;
+            end
+
     
 % ######################################## Lab 3 Functions ########################################
         % takes a 3x1 task space position vector (i.e. x, y, z components of pBaseTip that 
