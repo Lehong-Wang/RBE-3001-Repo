@@ -37,7 +37,7 @@ try
     [make_plot, plot_pos, plot_arm] = Model;
 
     make_plot();
-    for i = (1:100)
+    for i = (1:1000)
         t_mat = robot.get_all_trans_mat()
         plot_arm(t_mat)
         pause(.1);

@@ -1,5 +1,4 @@
 % This  Model  class  should  reference  your Robot class for the kinematics calculations
-classdef Model
 
 
 function [make_plot, plot_pos, plot_arm] = Model
