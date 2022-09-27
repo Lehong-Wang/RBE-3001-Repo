@@ -20,132 +20,147 @@ myHIDSimplePacketComs.setPid(pid);
 myHIDSimplePacketComs.setVid(vid);
 myHIDSimplePacketComs.connect();
 
-
 % Create a PacketProcessor object to send data to the nucleo firmware
-robot = Robot(myHIDSimplePacketComs); 
-model2 = Model2();
+pp = Robot(myHIDSimplePacketComs); 
+traj = Traj_Planner();
+try
+  SERV_ID = 1848;            % we will be talking to server ID 1848 on
+                           % the Nucleo
+  SERVER_ID_READ =1910;% ID of the read packet
+  DEBUG   = true;          % enables/disables debug prints
 
-robot.interpolate_jp([47.7263 37.6955 44.7286], 1000);
-pause(1.5)
-
-
-  ifReach = 0;  %set a boolean if Reach the set point 
-  position1 = []; %create an empty matrix to store the data of joints position
-  timeStamp1 = [];
-  jointAngle1 = [];
-  input1 = robot.ik3001([50,55,75]);
-  robot.servo_jp(transpose(input1));  %using function to move arm with interpolate of 1.5s
-  tStart1 = tic;
-  while( ifReach < 1)   %using while loop
-      currentT = robot.measured_cp(); %record current position
-      currentPos = currentT(1:3,4);
-      jointA1 = robot.ik3001(currentPos);
-      tCurr1 = toc(tStart1);
-      position1 = [position1; transpose(currentPos)]; %input position data to matrix
-      timeStamp1 = [timeStamp1; tCurr1];
-      jointAngle1 = [jointAngle1; transpose(jointA1)];
-      if currentT(2,4) >= 55     %if reach the set point, stop the recording
-          ifReach = 1;
-      end
-  end
-
-
-  ifReach = 0;  %set a boolean if Reach the set point 
-  position2 = []; %create an empty matrix to store the data of joints position
-  timeStamp2 = [];
-  jointAngle2 = [];
-  input2 = robot.ik3001([50 0 35]);
-  robot.servo_jp(transpose(input2)); %using function to move arm with interpolate of 1.5s
-  while( ifReach < 1)   %using while loop
-      currentT = robot.measured_cp(); %record current position
-      currentPos = currentT(1:3,4);
-      jointA2 = robot.ik3001(currentPos);
-      tCurr2 = toc(tStart1);
-      position2 = [position2; transpose(currentPos)]; %input position data to matrix
-      timeStamp2 = [timeStamp2; tCurr2];
-      jointAngle2 = [jointAngle2; transpose(jointA2)];
-      if currentT(2,4) <= 0     %if reach the set point, stop the recording
-          ifReach = 1;
-      end
-  end
-
+  % Instantiate a packet - the following instruction allocates 60
+  % bytes for this purpose. Recall that the HID interface supports
+  % packet sizes up to 64 bytes.
+  packet = zeros(15, 1, 'single');
   
-  ifReach = 0;  %set a boolean if Reach the set point 
-  position3 = []; %create an empty matrix to store the data of joints position
-  timeStamp3 = [];
-  jointAngle3 = [];
-  input3 = robot.ik3001([140 60 90]);
-  robot.servo_jp(transpose(input3));  %using function to move arm with interpolate of 1.5s
-  while( ifReach < 1)   %using while loop
-      currentT = robot.measured_cp(); %record current position
-      currentPos = currentT(1:3,4);
-      jointA3 = robot.ik3001(currentPos);
-      tCurr3 = toc(tStart1);
-      position3 = [position3; transpose(currentPos)]; %input position data to matrix
-      timeStamp3 = [timeStamp3; tCurr3];
-      jointAngle3 = [jointAngle3; transpose(jointA3)];
-      if currentT(2,4) >= 60     %if reach the set point, stop the recording
-          ifReach = 1;
-      end
-  end
-
   
-  ifReach = 0;  %set a boolean if Reach the set point 
-  position4 = []; %create an empty matrix to store the data of joints position
-  timeStamp4 = [];
-  jointAngle4 = [];
-  robot.servo_jp(transpose(input1));  %using function to move arm with interpolate of 1.5s
-  while( ifReach < 1)   %using while loop
-      currentT = robot.measured_cp(); %record current position
-      currentPos = currentT(1:3,4);
-      jointA4 = robot.ik3001(currentPos);
-      tCurr4 = toc(tStart1);
-      position4 = [position4; transpose(currentPos)]; %input position data to matrix
-      timeStamp4 = [timeStamp4; tCurr4];
-      jointAngle4 = [jointAngle4; transpose(jointA4)];
-      if currentT(2,4) <= 55      %if reach the set point, stop the recording
-          ifReach = 1;
-      end
-  end
-
-  positionT = [position1;position2;position3;position4];
-  timeT = [timeStamp1; timeStamp2; timeStamp3; timeStamp4];
-  jointT = [jointAngle1; jointAngle2; jointAngle3; jointAngle4];
+  J = pp.jacob3001([0 90 -90])
+  disp(det(J(1:3,:)));
   
-figure
-plot(timeT,positionT(:,1))
-hold on
-plot(timeT,positionT(:,2))
-hold on
-plot(timeT,positionT(:,3))
-title("Position VS Time")
-xlabel("Time(ms)");
-ylabel("Position(mm)");
-xlabel("Time(s)");
-legend('X','Y','Z');
-hold off;
+  
+  
+   Pos1 = [50,55,75];
+   Pos2 = [75 -60 35];
+   Pos3 = [140 60 90];
+  
+% Linear Trajectory 
 
-figure
-plot(timeT,jointT(:,1))
-hold on
-plot(timeT,jointT(:,2))
-hold on
-plot(timeT,jointT(:,3))
-title("Joint Angles VS Time");
-xlabel("Time(s)");
-ylabel("Joint Angle(degree)");
-legend('Joint1','Joint2','Joint3');
-hold off;
+i = 1; % counts iterations
+prevEndpoint = [-500; -500; -500; -500]; %initialize variable to impossible values so it never overlaps
+AV = pp.measured_js(1,1); 
+fkAngle = transpose(AV(1, :));
+qVelocity = AV(2,:);
+endpoint = pp.fk3001(fkAngle)* [0; 0; 0; 1];
 
-figure
-plot3(positionT(:,1),positionT(:,2),positionT(:,3))
-title("3D Position Trajectory");
-xlabel('X-Position');
-ylabel('Y-Position');
-zlabel('Z-Position');
-writematrix(positionT,'positionArray.csv')
+tic
+while toc < 7
+    
+    if ~(pp.finished_movement(transpose(endpoint(1:3,1)), Pos2)) && (toc <= 2)
+      
+        x12traj = traj.linear_traj(Pos1(1,1), Pos2(1,1), 0, 2, toc);  
+        y12traj = traj.linear_traj(Pos1(1,2), Pos2(1,2), 0, 2, toc);
+        z12traj = traj.linear_traj(Pos1(1,3), Pos2(1,3), 0, 2, toc);
+        pp.interpolate_jp(pp.ik3001([x12traj, y12traj, z12traj]),1000);
+      
+    elseif ~(pp.finished_movement(transpose(endpoint(1:3,1)), Pos3)) && toc > 2 && toc < 4
+
+        x23traj = traj.linear_traj(Pos2(1,1), Pos3(1,1), 2, 4, toc);
+        y23traj = traj.linear_traj(Pos2(1,2), Pos3(1,2), 2, 4, toc);
+        z23traj = traj.linear_traj(Pos2(1,3), Pos3(1,3), 2, 4, toc);
+        pp.interpolate_jp(pp.ik3001([x23traj, y23traj, z23traj]),1000);
+            
+    elseif ~(pp.finished_movement(transpose(endpoint(1:3,1)), Pos1)) && toc > 4 && toc < 6
+      
+        x31traj = traj.linear_traj(Pos3(1,1), Pos1(1,1), 4, 6, toc);
+        y31traj = traj.linear_traj(Pos3(1,2), Pos1(1,2), 4, 6, toc);
+        z31traj = traj.linear_traj(Pos3(1,3), Pos1(1,3), 4, 6, toc);  
+        pp.interpolate_jp(pp.ik3001([x31traj, y31traj, z31traj]),1000);
+   
+    end
+    
+    AV = pp.measured_js(1,1);
+    fkAngle = transpose(AV(1, :));
+    qVelocity = transpose(AV(2,:));
+    endpoint = pp.fk3001(fkAngle)* [0; 0; 0; 1];
+    ee_jacob = pp.jacob3001(fkAngle);
+    ee_velocity = ee_jacob(1:3,1:3)*qVelocity;
+    pp.plot_arm(fkAngle,ee_velocity)
+    
+    if(prevEndpoint(1,1) ~= endpoint(1,1) || prevEndpoint(2,1) ~= endpoint(2,1) || prevEndpoint(3,1) ~= endpoint(3,1) && 0 ~= endpoint(1,1) && 0 ~= endpoint(2,1) && 0 ~= endpoint(3,1))
+        lin_traj_m(i, 1) = toc;
+        lin_traj_m(i, 2) = AV(2,1);
+        lin_traj_m(i, 3) = AV(2,2);
+        lin_traj_m(i, 4) = AV(2,3);
+
+        lin_traj_m(i,5) = ee_velocity(1,1);
+        lin_traj_m(i,6) = ee_velocity(2,1);
+        lin_traj_m(i,7) = ee_velocity(3,1);
+        lin_traj_m(i,8) = sqrt(ee_velocity(1,1)^2 + ee_velocity(2,1)^2 + ee_velocity(3,1)^2); %Calculates Scalar Velocity
+        i = i+1;
+    end
+
+    prevEndpoint = endpoint;
+    
+end
+
+writematrix(lin_traj_m,'linear_velocity_data.csv');
+filename = 'linear_velocity_data.csv';
+
+traj_data = csvread(filename);
+time = traj_data(:,1);
+
+% Linear Velocities
+xVel = traj_data(:,5);
+yVel = traj_data(:,6);
+zVel = traj_data(:,7);
+
+%Angular Velocities
+xAngVel = traj_data(:,2);
+yAngVel = traj_data(:,3);
+zAngVel = traj_data(:,4);
+
+%Scalar Velocity
+ScalarVel = traj_data(:,8);
+
+subplot(3,2,1)
+plot(time,xVel); 
+hold on
+plot(time,yVel);
+plot(time,zVel);
+hold off
+
+title("End Effector Linear Velocity");
+xlabel('Time(s)') ;
+ylabel('Linear Velocity(mm/s)'); 
+legend('X Velocity', 'Y Velocity', 'Z Velocity');
+
+subplot(3,2,2)
+plot(time,xAngVel); 
+hold on
+plot(time,yAngVel);
+plot(time,zAngVel);
+hold off
+
+title("End Effector Angular Velocity");
+xlabel('Time(s)') ;
+ylabel(' Angular Velocity(deg/s)'); 
+legend('X Angular Velocity', 'Y Angular Velocity', 'Z Angular Velocity');
+  
+subplot(3,2,3)
+plot(time,ScalarVel); 
+
+title("End Effector Scalar Linear Velocity");
+xlabel('Time(s)') ;
+ylabel(' Scalar Linear Velocity(deg/s)'); 
+legend('Scalar Linear Velocity');
+  
+  catch exception
+    getReport(exception)
+    disp('Exited on error, clean shutdown');
+end
 
 % Clear up memory upon termination
-robot.shutdown()
+pp.shutdown()
 
-%toc
+% tozc
