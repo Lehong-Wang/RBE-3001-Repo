@@ -169,6 +169,7 @@ classdef Matrix
             % all things below are already bounded by this
             if (x^2 + y^2 + (z-95)^2) > 200^2
                 in_work_space = false;
+                disp([x,y,z]);
                 error('ERROR: NOT in work space! \nArm not long enough');
             end
             % bottom part, limited by base joint 
@@ -176,10 +177,12 @@ classdef Matrix
             if (z >= 0 && z <= 95)
                 if x<0
                     in_work_space = false;
+                    disp([x,y,z]);
                     error("ERROR: NOT in work space! \nJoint 1 limitation [90, -90] (bottom)");
                 end
                 if x^2+y^2 < 50^2
                     in_work_space = false;
+                    disp([x,y,z]);
                     error("ERROR: NOT in work space! \nMay hit base joint");
                 end
                 in_work_space = true;
@@ -190,10 +193,12 @@ classdef Matrix
             if (z > 95 && z <= 95+100*2^0.5)
                 if x<0
                     in_work_space = false;
+                    disp([x,y,z]);
                     error("ERROR: NOT in work space! \nJoint 1 limitation [90, -90] (middle)");
                 end
                 if sqrt(x^2+y^2) < sqrt(100^2-(z-195)^2)-50*2^0.5
                     in_work_space = false;
+                    disp([x,y,z]);
                     error("ERROR: NOT in work space! \nJoint 2 limitation [90, -45] (middle)");
                 end
                 in_work_space = true;
@@ -205,7 +210,8 @@ classdef Matrix
                 disp(sqrt(x^2+y^2))
                 if x<0 && sqrt(x^2+y^2) > 50*2^0.5-sqrt(100^2-(z-195)^2) && sqrt(x^2+y^2) < 50*2^0.5+sqrt(100^2-(z-195)^2)
                    in_work_space = false;
-                    error("ERROR: NOT in work space! \nJoint 2 limitation [90, -45] (top)");
+                   disp([x,y,z]);
+                   error("ERROR: NOT in work space! \nJoint 2 limitation [90, -45] (top)");
                 end 
                 in_work_space = true;
                 return
@@ -227,16 +233,16 @@ classdef Matrix
         function T = ik3001(x,y,z)
             Matrix.check_in_work_space(x,y,z);
 
-            q1 = atan2(y, x)   % should be atan2(y, +-x), but x>0 (for simplicity)
+            q1 = atan2(y, x);   % should be atan2(y, +-x), but x>0 (for simplicity)
             l = sqrt(x^2 + y^2 + (z-95)^2);     % length from joint2 to tip
-            cos_theta = (2 * 100^2 - (x^2 + y^2 + (z-95)^2)) / (2 * 100^2)  % angle between joint3-joint2 and joint3-tip
-            s3 = -cos_theta        % q3 = theta + pi/2
-            c3 = sqrt(1 - s3^2)     % should be +-sqrt, but -pi/2 < q3 < pi/2, cos(q3) > 0
-            q3 = atan2(s3, c3)     
+            cos_theta = (2 * 100^2 - (x^2 + y^2 + (z-95)^2)) / (2 * 100^2);  % angle between joint3-joint2 and joint3-tip
+            s3 = -cos_theta;        % q3 = theta + pi/2
+            c3 = sqrt(1 - s3^2);     % should be +-sqrt, but -pi/2 < q3 < pi/2, cos(q3) > 0
+            q3 = atan2(s3, c3);     
             
-            alpha = atan2(z-95, sqrt(x^2+y^2))  % angle between line joint1-tip and horizontal line 
-            beta = (pi/2 - q3) / 2      % another angle of the triangle, angle between line joint2-tip and line joint2-joint3
-            q2 = pi/2 - alpha - beta    % q2 + alpha + beta = pi/2
+            alpha = atan2(z-95, sqrt(x^2+y^2));  % angle between line joint1-tip and horizontal line 
+            beta = (pi/2 - q3) / 2;      % another angle of the triangle, angle between line joint2-tip and line joint2-joint3
+            q2 = pi/2 - alpha - beta;    % q2 + alpha + beta = pi/2
 
             T = [rad2deg(q1) rad2deg(q2) -rad2deg(q3)];  % direction of q3 is inverse (up is minus)
         end

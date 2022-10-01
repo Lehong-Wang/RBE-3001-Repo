@@ -10,7 +10,117 @@ classdef Robot < handle
 %     matrix = Matrix();
 
     methods
-    
+
+
+
+
+
+
+% ######################################## Lab 3 Functions ########################################
+
+        % take in 3*n matrix of targets to reach (currently 3 joint in degrees)
+        % take in time in seconds
+        function record_mat = run_trajectory(self, target_matrix, time)
+            if size(target_matrix, 1) ~= 3
+                error("Target Matrix should be 3*n");
+            end
+            record_mat = zeros(0);
+
+            tic
+            % parse out target pairs
+            for i = (1:size(target_matrix, 2)-1)
+
+                start_tar = target_matrix(:,i);
+                end_tar = target_matrix(:,i+1);
+                start_time = toc;
+                end_time = start_time + time;
+
+                param_mat = Traj_Planner.solve_parameter_velocity(start_time, end_time, start_tar, end_tar);
+
+                % for each start-end
+                while toc < end_time
+                    t = toc;
+                    target = Traj_Planner.get_angle_target_pos(param_mat, t);
+                    self.servo_jp(target);
+                    % save graph data
+                    recording = self.save_pos_data(t);
+                    % recording = self.save_pos_plan(target, t);
+                    record_mat = [record_mat; recording];
+ 
+                end
+                
+
+            end
+            disp(record_mat);
+        end
+
+
+        % get the position data and format into [time x y z]
+        function recording = save_pos_data(self, t)
+            pos = self.measured_cp();
+            recording = [t pos(1,4) pos(2,4) pos(3,4)];
+        end
+
+        % get the position plan and format into [time x y z]
+        function recording = save_pos_plan(self, target, t)
+
+            pos = Matrix.hard_code(target(1), target(2), target(3));
+            recording = [t pos(1,4) pos(2,4) pos(3,4)];
+        end
+        
+
+        % take in a function handle that calculates x,z with y
+        %   some function handles are defined in Traj_Planner
+        %   they all take y and return [x y z] 
+        % NOTE: y should have corrspond to one unique x and unique z
+        %       trajectory with constant y will not work
+        % also take in start and end of y pos, and total time
+        function record_mat = run_function_trajectory(self, func, start_y, end_y, time)
+                        
+            tic
+
+            start_time = toc;
+            end_time = start_time + time;
+            record_mat = zeros(0);
+            record_plan = zeros(0);
+            record_pos = zeros(0);
+            % solve parameters for y
+            param_y = Traj_Planner.solve_parameter_function(start_time, end_time, start_y, end_y);
+
+            while toc < end_time
+                t = toc;     
+                % calculate full x,y,z target angle           
+                target = Traj_Planner.get_angle_target_func(param_y, func, t)
+                self.servo_jp(target);
+                % save graph data
+                recording = self.save_pos_plan(target, t);
+                record_plan = [record_plan; recording];
+                recording = self.save_pos_data(t);
+                record_pos = [record_pos; recording];
+
+
+            end
+            record_mat(:,:,1) = record_plan;
+            record_mat(:,:,2) = record_pos;
+
+        end
+
+        % plot the recorded data
+        function plot_record(self, record_mat)
+            hold on
+            for i = (1:size(record_mat,3))
+                % time_vector = record_mat(:,1,i);
+                x_vector = record_mat(:,2,i);
+                y_vector = record_mat(:,3,i);
+                z_vector = record_mat(:,4,i);
+                plot3(x_vector, y_vector, z_vector);
+                axis([-100 200 -200 200 0 300]);
+
+            end
+        end
+
+
+
 
 % ######################################## Lab 2 Functions ########################################
 
@@ -19,9 +129,9 @@ classdef Robot < handle
             status_tab = self.measured_js(1,0);
             pos = status_tab(1,:);
             % turn degree to radians
-            pos_rad = arrayfun(@(x) deg2rad(x), pos);
-            T = Matrix.fk3001(pos_rad);
-            disp(pos);
+            % pos_rad = arrayfun(@(x) deg2rad(x), pos);
+            T = Matrix.fk3001(pos(1), pos(2), pos(3));
+            % disp(pos);
         end
 
         % takes data from setpoint_js() and returns a 4x4 homogeneous transformation 
