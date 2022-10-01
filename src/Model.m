@@ -8,6 +8,7 @@ function [make_plot, plot_pos, plot_arm] = Model
 end
 
 
+% plot 3d real-time update stick figure
 function make_plot
     X = zeros(1,2);
     Y = zeros(1,2);
