@@ -59,5 +59,5 @@ catch exception
 end
 
 %% Shutdown Procedure
-robot.shutdown()
+% robot.shutdown()
 cam.shutdown()

@@ -39,8 +39,8 @@ classdef Camera < handle
                 disp("Clear surface of any items, then press any key to continue");
                 pause;
                 disp("Calibrating");
-%                 camcalib; % Change this if you are using a different calibration script
-                untitled4; % Change this if you are using a different calibration script
+                camcalib; % Change this if you are using a different calibration script
+%                 camcalib_fast; % less image for faster debugging
                 params = cameraParams;
                 disp("Camera calibration complete!");
             catch exception
@@ -81,5 +81,42 @@ classdef Camera < handle
             pose = [   R,    t';
                     0, 0, 0, 1];
         end
+    
+ 
+
+        % ---------------------------------- lab 5 functions ----------------------------------
+    
+        % take in the point in image coordinate
+        % return the point coordinate in base frame of robot
+        % NOTE: DO NOT use the undistorted image returned from getImage
+        %       That is equivolent to doing undistortion twice, and fuck up everything !!!  
+        function coord = getWorldCoord(self, image_coord)
+            % get rotation and translation from matrix
+            rot_mat = self.cam_pose(1:3, 1:3);
+            trans_mat = self.cam_pose(1:3, 4);
+            cam_intrinsics = self.params.Intrinsics;
+
+            checker_board_coord = pointsToWorld(cam_intrinsics, rot_mat, trans_mat, image_coord);
+            disp(checker_board_coord);
+            T_base_checker = [ 0 1 75;
+                               1 0 -100;
+                               0 0 1;];
+            % make checker_board_coord 3*1
+            checker_board_coord = [transpose(checker_board_coord); 1];
+            base_coord = T_base_checker * checker_board_coord;
+            % take out the extra row
+            coord = base_coord(1:2, 1);
+%             disp(coord);
+
+        end 
+
+    
+    
+    
+    
+    
+    
+    
+    
     end
 end
