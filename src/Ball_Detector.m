@@ -79,8 +79,8 @@ classdef Ball_Detector
       blobAnalysis = vision.BlobAnalysis(AreaOutputPort = true,...
           CentroidOutputPort = false,...
           BoundingBoxOutputPort = true,...
-          MinimumBlobArea = 200, ExcludeBorderBlobs = true);
-      [areas, boxes] = step(blobAnalysis, BW);
+          MinimumBlobArea = 5000, ExcludeBorderBlobs = true);
+      [areas, boxes] = step(blobAnalysis, BW)
       
       % Sort connected components in descending order by area
       [~, idx] = sort(areas, "Descend");
@@ -99,29 +99,38 @@ classdef Ball_Detector
       % Insert labels for the coins.
       imDetectedCoins = insertObjectAnnotation(RGB, "rectangle", boxes, "Ball");
       imDetectedCoins = insertObjectAnnotation(imDetectedCoins, "circle", centers, "Center");
-%       figure; 
-%       imshow(imDetectedCoins);
+      figure; 
+      imshow(imDetectedCoins);
 
       centers = centers(:,1:2);
 
     end
 
 
-% 
-%     function getRealCoord(centers, cam)
-%         cam_height = 180;
-%         center_height = 10;
-% 
-%         for i = (1 : size(centers,1))
-%             pixel_center = centers(i,:);
-%             proj_center = cam.getWorldCoord(pixel_center);
-%         end
-%     end
-% 
-% 
-% 
-% 
-% 
+
+    function reals = getRealCoord(centers, cam)
+        cam_height = 180;
+        cam_pos = [200, 0];
+        center_height = 10;
+
+        reals = zeros(0);
+
+        for i = (1 : size(centers,1))
+            pixel_center = centers(i,:)
+            proj_center = cam.getWorldCoord(pixel_center)
+
+            dis_to_cam = proj_center - cam_pos;
+
+            real_center = proj_center - dis_to_cam * (center_height/cam_height)
+            reals(i,:) = real_center;
+        end
+        disp(reals);
+    end
+
+
+
+
+
 
 
 
