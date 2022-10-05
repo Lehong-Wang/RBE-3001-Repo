@@ -87,7 +87,7 @@ classdef Camera < handle
         % ---------------------------------- lab 5 functions ----------------------------------
     
         % take in the point in image coordinate
-        % return the point coordinate in base frame of robot
+        % return the 1*2 point coordinate in base frame of robot
         % NOTE: DO NOT use the undistorted image returned from getImage
         %       That is equivolent to doing undistortion twice, and fuck up everything !!!  
         function coord = getWorldCoord(self, image_coord)
@@ -105,7 +105,7 @@ classdef Camera < handle
             checker_board_coord = [transpose(checker_board_coord); 1];
             base_coord = T_base_checker * checker_board_coord;
             % take out the extra row
-            coord = base_coord(1:2, 1);
+            coord = transpose(base_coord(1:2, 1));
 %             disp(coord);
 
         end 
