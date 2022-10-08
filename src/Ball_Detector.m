@@ -37,13 +37,13 @@ classdef Ball_Detector
               channel1Min = 0.9;
               channel1Max = 0.215;
           otherwise
-          channel1Min = 0;
-          channel1Max = 1; 
+          channel1Min =-0.5;
+          channel1Max = 0.499; 
           warning("Unexpected color type");
 
       end
         % white channel
-      channel2Min = 0.3;
+      channel2Min = 0.4;
       channel2Max = 1.000;
         % black channel
       channel3Min = 0.4;
@@ -106,8 +106,8 @@ classdef Ball_Detector
       % Insert box and center for the balls.
       labeled_img = insertObjectAnnotation(RGB, "rectangle", boxes, "Ball");
       labeled_img = insertObjectAnnotation(labeled_img, "circle", centers, "Center");
-      figure; 
-      imshow(labeled_img);
+%       figure; 
+%       imshow(labeled_img);
       % get center x,y coord
       centers = centers(:,1:2);
       disp(centers);
@@ -140,8 +140,16 @@ classdef Ball_Detector
     % wrapper
     function coords = getBallPose(img, color, cam)
         [BW,RGB] = Ball_Detector.createMaskedImage(img, color);
-        centers = Ball_Detector.detectBall(BW, RGB);
-        coords = Ball_Detector.getRealCoord(centers, cam);
+%         imshow(BW);
+%         imshow(RGB);
+        try
+            centers = Ball_Detector.detectBall(BW, RGB);
+            coords = Ball_Detector.getRealCoord(centers, cam);
+        catch exception
+            getReport(exception)
+            disp(["No ball with color ", color]);
+            coords = zeros(0);
+        end
 
     end
 

@@ -16,6 +16,54 @@ classdef Robot < handle
 
 
 
+
+
+
+
+
+% ######################################## Lab 5 Functions ########################################
+
+
+
+
+
+
+
+        
+        function pick_up_balls(self, ball_coords, drop_coord)
+            disp(ball_coords);
+            self.run_trajectory([100;0;195], 1);
+            for i = 1 : size(ball_coords, 1)
+                self.openGripper();
+                target_coord = [ball_coords(i,1) ball_coords(i,1); 
+                                ball_coords(i,2) ball_coords(i,2); 
+                                50 10];
+                disp(target_coord);
+                self.run_trajectory(target_coord, 2);
+                pause(1);
+                self.closeGripper();
+                pause(1);
+                self.run_trajectory([100;0;195], 1);
+                drop_target_coord = [drop_coord(1) drop_coord(1); 
+                                drop_coord(2) drop_coord(2); 
+                                50 10];
+                self.run_trajectory(drop_target_coord, 1);
+                pause(1);
+                self.openGripper();
+                self.run_trajectory([drop_coord(1); drop_coord(2); 100], 1);
+
+
+            end
+            self.run_trajectory([100;0;195], 1);
+        end
+
+
+
+
+
+
+
+
 % ######################################## Lab 3 Functions ########################################
 
         % take in 3*n matrix of targets to reach (currently 3 joint in degrees)
@@ -25,6 +73,10 @@ classdef Robot < handle
                 error("Target Matrix should be 3*n");
             end
             record_mat = zeros(0);
+
+            current_trans = self.measured_cp();
+            current_pos = current_trans(1:3, 4);
+            target_matrix = [current_pos target_matrix];
 
             tic
             % parse out target pairs
@@ -51,7 +103,7 @@ classdef Robot < handle
                 
 
             end
-            disp(record_mat);
+%             disp(record_mat);
         end
 
 

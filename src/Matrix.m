@@ -231,7 +231,7 @@ classdef Matrix
         % take in x,y,z position
         % output 1*3 matrix of joint angles in degrees
         function T = ik3001(x,y,z)
-            Matrix.check_in_work_space(x,y,z);
+%             Matrix.check_in_work_space(x,y,z);
 
             q1 = atan2(y, x);   % should be atan2(y, +-x), but x>0 (for simplicity)
             l = sqrt(x^2 + y^2 + (z-95)^2);     % length from joint2 to tip
