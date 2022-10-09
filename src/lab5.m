@@ -24,9 +24,9 @@ myHIDSimplePacketComs.connect();
 robot = Robot(myHIDSimplePacketComs); 
 try
 %     % calibrate a camera
-    camera = Camera();
+%     camera = Camera();
     % load a already calibrated camera object
-%     load("cam_obj.mat")
+    load("cam_obj.mat")
     disp("Place the balls");
     pause;
 
@@ -45,10 +45,11 @@ try
     color_array = ['R' 'O' 'Y' 'G'];
 
 
+    coords = Ball_Detector.plotError(img, 's', camera);
 %     coords = Ball_Detector.getBallPose(img, 's', camera);
 %     while (size(coords,1) ~= 0)
 
-%         robot.pick_up_balls(coords, drop_coord_red);
+        robot.pick_up_balls(coords, drop_coord_red);
 %     end
 
 % 

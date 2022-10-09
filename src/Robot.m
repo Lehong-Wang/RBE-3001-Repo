@@ -13,12 +13,6 @@ classdef Robot < handle
 
 
 
-        % ######################################## Game Functions ########################################
-
-
-
-
-
 
 
 
@@ -78,6 +72,7 @@ classdef Robot < handle
             current_trans = self.measured_cp();
             current_pos = current_trans(1:3, 4);
             target_matrix = [current_pos target_matrix];
+%             target_matrix = target_matrix * 1.02;
 
             tic
             % parse out target pairs

@@ -38,41 +38,53 @@ try
     layout = Ball_Detector.getLayout(img, computer_color, human_color, camera);
     
     while ~ Game.checkWin(layout(:,:,1), layout(:,:,2))
+
         img = snapshot(camera.cam);
-        layout = Ball_Detector.getLayout(img, computer_color, human_color, camera)
+        % calculate the current board layout
+        layout = Ball_Detector.getLayout(img, computer_color, human_color, camera);
+        % calculate where to pickup an extra ball
         pickup_coord = Ball_Detector.getPickupCoord(img, computer_color, camera);
 
-        while length(pickup_coord) == 0
+        % no pickup balls
+        while isempty(pickup_coord)
             disp("Place Extra balls for robot");
             pause;
             img = snapshot(camera.cam);
             pickup_coord = Ball_Detector.getPickupCoord(img, computer_color, camera);
         end
         imshow(img);
-%         pause;
 
-        computer_move_pos = Game.computerMove(layout(:,:,1), layout(:,:,2))
-        % board filled
-        if length(computer_move_pos) == 0
+
+        % calculate lastest layout
+        layout = Ball_Detector.getLayout(img, computer_color, human_color, camera);
+        % calculate move position
+        computer_move_pos = Game.computerMove(layout(:,:,1), layout(:,:,2));
+        % handle computerMove special cases
+        % case board filled
+        if isempty(computer_move_pos)
             disp("Board Filled");
             break;
         end
-        % human / computer already won
+        % case human / computer already won
         if length(computer_move_pos) == 1
             disp("Already Won");
             break;
         end
-
         disp("Robor Playing");
 
-        place_coord = Ball_Detector.board2Coord(computer_move_pos(1), computer_move_pos(2));
 
+        % calculate ball placement in base frame
+        place_coord = Ball_Detector.board2Coord(computer_move_pos(1), computer_move_pos(2));
+        % robot pickup and place ball
         robot.pick_up_balls(pickup_coord, place_coord);
         pause(1);
         
+
+        % after placing, check if already won / fill
         img = snapshot(camera.cam);
         imshow(img);
-        layout = Ball_Detector.getLayout(img, computer_color, human_color, camera)
+        layout = Ball_Detector.getLayout(img, computer_color, human_color, camera);
+%         pause;
         if Game.checkWin(layout(:,:,1), layout(:,:,2))
             disp("Robot Won");
             break;
@@ -88,8 +100,9 @@ try
         disp("Place your move");
         pause;
 
+        % refresh layout for check win loop
         img = snapshot(camera.cam);
-        layout = Ball_Detector.getLayout(img, computer_color, human_color, camera)
+        layout = Ball_Detector.getLayout(img, computer_color, human_color, camera);
 
     end
 
