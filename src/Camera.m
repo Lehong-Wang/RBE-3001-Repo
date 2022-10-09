@@ -39,8 +39,8 @@ classdef Camera < handle
                 disp("Clear surface of any items, then press any key to continue");
                 pause;
                 disp("Calibrating");
-                % camcalib; % Change this if you are using a different calibration script
-                camcalib_fast; % less image for faster debugging
+                camcalib; % Change this if you are using a different calibration script
+%                 camcalib_fast; % less image for faster debugging
                 params = cameraParams;
                 disp("Camera calibration complete!");
             catch exception

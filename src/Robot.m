@@ -13,6 +13,7 @@ classdef Robot < handle
 
 
 
+        % ######################################## Game Functions ########################################
 
 
 
@@ -21,7 +22,7 @@ classdef Robot < handle
 
 
 
-% ######################################## Lab 5 Functions ########################################
+        % ######################################## Lab 5 Functions ########################################
 
 
 
@@ -142,7 +143,7 @@ classdef Robot < handle
             while toc < end_time
                 t = toc;     
                 % calculate full x,y,z target angle           
-                target = Traj_Planner.get_angle_target_func(param_y, func, t)
+                target = Traj_Planner.get_angle_target_func(param_y, func, t);
                 self.servo_jp(target);
                 % save graph data
                 recording = self.save_pos_plan(target, t);
@@ -312,7 +313,7 @@ classdef Robot < handle
         function packet = setpoint_js(self)
             packet = zeros(1, 3, 'single');     % Initalize matrix to zeros
             SERVER_ID_READ = 1848; % Setpoint packet ID
-            returnPacket = self.read(SERVER_ID_READ) % Read from Postions and Setpoint packet
+            returnPacket = self.read(SERVER_ID_READ); % Read from Postions and Setpoint packet
             packet(1) = returnPacket(3);
             packet(2) = returnPacket(4);
             packet(3) = returnPacket(5);
