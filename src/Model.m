@@ -18,8 +18,8 @@ function make_plot
     assignin('base','base_plot_z',Z);
 
     hold on
-    plot_line = plot3(X,Y,Z);
-    plot_dot = plot3(X,Y,Z,'.');
+    plot_line = plot3(X,Y,Z, "LineWidth", 5);
+    plot_dot = plot3(X,Y,Z,'.',"MarkerSize",50);
     axis([-100 200 -200 200 0 300]);
     view(-30,45);
     grid on

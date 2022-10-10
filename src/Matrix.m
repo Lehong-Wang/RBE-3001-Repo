@@ -79,10 +79,12 @@ classdef Matrix
         % takes in 3 joint in degrees
         % return a 4*4 homogeneous transformation matrix  
         % representing the position and orientation of the tip frame with respect to the base frame 
-        function T = fk3001(q1, q2, q3)
+%         function T = fk3001(q1, q2, q3)
+        function T = fk3001(joint_config)
 
 %             pos = arrayfun(@(x) deg2rad(x), joint_config);
-            pos = [deg2rad(q1) deg2rad(q2) deg2rad(q3)];
+%             pos = [deg2rad(q1) deg2rad(q2) deg2rad(q3)];
+            pos = joint_config;
             dh_tab = zeros(1,4);
             % base to joint 1
             dh_tab(1,:) = [0 55 0 0];
