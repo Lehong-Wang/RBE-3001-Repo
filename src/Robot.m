@@ -37,7 +37,7 @@ classdef Robot < handle
                 self.run_trajectory(target_coord, 2);
                 pause(1);
                 self.closeGripper();
-                pause(1);
+                pause(0.5);
                 self.run_trajectory([100;0;195], 1);
                 drop_target_coord = [drop_coord(1) drop_coord(1); 
                                 drop_coord(2) drop_coord(2); 
@@ -123,8 +123,37 @@ classdef Robot < handle
         % NOTE: y should have corrspond to one unique x and unique z
         %       trajectory with constant y will not work
         % also take in start and end of y pos, and total time
-        function record_mat = run_function_trajectory(self, func, start_y, end_y, time)
-                        
+        function record_mat = run_function_trajectory(self, func, start_y, end_y, time, do_real_time_plot)
+            global end_effector_T
+            end_effector_T = zeros(0)
+            refresh_count = 0;
+
+
+            if do_real_time_plot
+                hold on
+                Traj_Planner.plot_plan(func, start_y, end_y);
+
+                X = nan(1);
+                Y = nan(1);
+                Z = nan(1);
+                assignin('base','base_plot_x',X);
+                assignin('base','base_plot_y',Y);
+                assignin('base','base_plot_z',Z);
+
+                plot_line = plot3(X,Y,Z, "r",'LineWidth',3);
+                axis([-100 200 -200 200 0 300]);
+                view(-30,45);
+
+
+
+                plot_line.XDataSource = 'base_plot_x';
+                plot_line.YDataSource = 'base_plot_y';
+                plot_line.ZDataSource = 'base_plot_z';
+
+                pause;
+                
+            end
+
             tic
 
             start_time = toc;
@@ -132,11 +161,12 @@ classdef Robot < handle
             record_mat = zeros(0);
             record_plan = zeros(0);
             record_pos = zeros(0);
+
             % solve parameters for y
             param_y = Traj_Planner.solve_parameter_function(start_time, end_time, start_y, end_y);
-
             while toc < end_time
                 t = toc;     
+                refresh_count = refresh_count + 1;
                 % calculate full x,y,z target angle           
                 target = Traj_Planner.get_angle_target_func(param_y, func, t);
                 self.servo_jp(target);
@@ -145,7 +175,19 @@ classdef Robot < handle
                 record_plan = [record_plan; recording];
                 recording = self.save_pos_data(t);
                 record_pos = [record_pos; recording];
+                % save end effector transformation matrix to workspace
+                e_e_T = Matrix.hard_code(target(1), target(2), target(3));
+                end_effector_T = e_e_T;
+%                 assign('base', 'end_effector_T', e_e_T);
 
+                if do_real_time_plot && refresh_count > 20
+                    refresh_count = 0;
+                    assignin("base", 'base_plot_x', record_pos(100:end,2));
+                    assignin("base", 'base_plot_y', record_pos(100:end,3));
+                    assignin("base", 'base_plot_z', record_pos(100:end,4));
+                    refreshdata
+                    drawnow
+                end
 
             end
             record_mat(:,:,1) = record_plan;
@@ -213,7 +255,7 @@ classdef Robot < handle
             joint_angle = status_tab(1,:);
             % turn degree to radians
             pos_rad = arrayfun(@(x) deg2rad(x), joint_angle);
-            T_1 = Matrix.fk3001(zeros(0));
+            T_1 = Matrix.fk3001(zeros(1,3));
             T_2 = Matrix.fk3001(pos_rad(1));
             T_3 = Matrix.fk3001(pos_rad(1:2));
             T_4 = Matrix.fk3001(pos_rad(1:3));

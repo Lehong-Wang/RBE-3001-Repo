@@ -27,20 +27,23 @@ try
     SERVER_ID_READ =1910;
   
 %     robot.servo_jp([30 0 0]);
-
-    tar_0 = [100; 0; 195];
-    tar_1 = [70; 100; 20];
-    tar_2 = [70; -100; 40];
-
-    tar = [tar_0 tar_1 tar_2 tar_0];
+% 
+%     tar_0 = [100; 0; 195];
+%     tar_1 = [70; 100; 20];
+%     tar_2 = [70; -100; 40];
+% 
+%     tar = [tar_0 tar_1 tar_2 tar_0];
 
     % record_mat = robot.run_trajectory(tar, 2)
 %     robot.servo_jp([40,60,80]);
 %     pause(0.5);
 
-    record_mat = robot.run_function_trajectory(@Traj_Planner.verticle_half_circle ,-150, 150, 10)
+    robot.run_trajectory([100;0;195],1)
+    pause;
 
-    robot.plot_record(record_mat)
+    record_mat = robot.run_function_trajectory(@Traj_Planner.verticle_half_circle ,-150, 150, 10, true)
+
+%     robot.plot_record(record_mat)
 
 
     % time_vector = record_mat(:,1);

@@ -2,7 +2,12 @@
 
 classdef Traj_Planner
 
-    properties
+    properties (Constant)
+        % 20 degree rotate around tip z axis
+        pen_T = [cos(pi/5) -sin(pi/5) 0 0;
+                 sin(pi/5) cos(pi/5)  0 0;
+                 0         0          1 0;
+                 0         0          0 1;];
     end
 
     methods (Static)
@@ -137,6 +142,78 @@ classdef Traj_Planner
 
 
 
+        function pos = draw_heart_upper(y)
+            global end_effector_T
+            disp("End Effector T:");
+            disp(end_effector_T);
+            pen_length = 35;
+
+            if -45 <= y && y < 0
+                x = sqrt(23^2 - (y+22)^2) + 130;
+            elseif 0 <= y && y < 45
+                x = sqrt(23^2 - (y-22)^2) + 130;
+            else
+                x = 130;
+            end
+            
+            if size(end_effector_T,1) == 4
+                e_e_T = end_effector_T * Traj_Planner.pen_T
+                z_factor = e_e_T(3,1)
+                z = - pen_length * z_factor
+            else
+                z = 25
+            end
+            pos = [x y z];
+        end
+
+        function pos = draw_heart_lower(y)
+            global end_effector_T;
+            pen_length = 25;
+
+%             z = 30 - 8 + 8/45 * abs(y);
+            if -45 <= y && y < 0
+                x = -1*y + 85;
+            elseif 0 <= y && y < 45
+                x = 1*y + 85;
+            else
+                x = 130;
+            end
+
+            if size(end_effector_T,1) == 4
+                e_e_T = end_effector_T
+                e_e_T = end_effector_T * Traj_Planner.pen_T
+                z_factor = e_e_T(3,1)
+                z = - pen_length * z_factor
+            else
+                z = 25
+            end
+            pos = [x y z];
+        end
+
+
+
+
+
+
+        function plot_plan(fun, start_y, end_y)
+            x_vector = zeros(0);
+            y_vector = zeros(0);
+            z_vector = zeros(0);
+            for i = 1:1000
+                y = (end_y - start_y) * i / 1000 + start_y;
+                ret_pos = fun(y);
+                x_vector(i) = ret_pos(1);
+                y_vector(i) = ret_pos(2);
+                z_vector(i) = ret_pos(3);
+            end
+            plot3(x_vector, y_vector, z_vector, "b",'LineWidth',2);
+
+        end
+
+
+        function update_plot(x,y,z)
+
+        end
 
 
 

@@ -27,6 +27,8 @@ try
 %     camera = Camera();
     % load a already calibrated camera object
     load("cam_obj.mat")
+    robot.run_trajectory([100;0;195], 1);
+
     disp("Place the balls");
     pause;
 
@@ -35,9 +37,9 @@ try
 
 
     drop_coord_red = [0 -100];
-    drop_coord_orange = [50 -100];
+    drop_coord_orange = [0 -120];
     drop_coord_yellow = [0 100];
-    drop_coord_green = [50 100];
+    drop_coord_green = [0 120];
     drop_mat = [drop_coord_red;
                 drop_coord_orange;
                 drop_coord_yellow;
@@ -45,25 +47,26 @@ try
     color_array = ['R' 'O' 'Y' 'G'];
 
 
-    coords = Ball_Detector.plotError(img, 's', camera);
-%     coords = Ball_Detector.getBallPose(img, 's', camera);
-%     while (size(coords,1) ~= 0)
-
-        robot.pick_up_balls(coords, drop_coord_red);
-%     end
-
+%     coords = Ball_Detector.plotError(img, 's', camera);
+    coords = Ball_Detector.getBallPose(img, 's', camera);
+% %     while (size(coords,1) ~= 0)
 % 
+%         robot.pick_up_balls(coords, drop_coord_red);
+% %     end
+
+
 %     tic
-%     while (size(coords,1) ~= 0)
+    while (size(coords,1) ~= 0)
 %       if (toc > 1/30)
-%       img = snapshot(webcam("USB Camera"));
-%       coords = Ball_Detector.getBallPose(img, 's', camera);
-%       tracking_coord = [coords(1,1); coords(1,2); 100];
-%       robot.run_trajectory(tracking_coord, 1/30);
-% 
+      img = snapshot(webcam("USB Camera"));
+      coords = Ball_Detector.getBallPose(img, 'G', camera);
+      tracking_coord = [coords(1,1); coords(1,2); 100];
+      robot.run_trajectory(tracking_coord, 1/30);
+
 %       tic
 %       end
-%     end
+    end
+
 
 
 

@@ -31,8 +31,8 @@ try
     % load camera object
     load("cam_obj.mat");
     
-    human_color = 'Y';
-    computer_color = 'G';
+    human_color = 'G';
+    computer_color = 'Y';
 
     img = snapshot(camera.cam);
     layout = Ball_Detector.getLayout(img, computer_color, human_color, camera);
