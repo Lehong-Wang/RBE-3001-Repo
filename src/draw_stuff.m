@@ -29,8 +29,8 @@ try
     disp("Place the Marker");
     pause;
     robot.run_trajectory([125;-45;40], 2);
-    record1 = robot.run_function_trajectory(@Traj_Planner.draw_heart_upper, -45, 45, 5);
-    record2 = robot.run_function_trajectory(@Traj_Planner.draw_heart_lower, 45, -45, 5);
+    record1 = robot.run_function_trajectory(@Traj_Planner.draw_heart_upper, -45, 45, 5, false);
+    record2 = robot.run_function_trajectory(@Traj_Planner.draw_heart_lower, 45, -45, 5, false);
 
     record = [record1; record2];
 

@@ -155,7 +155,14 @@ classdef Ball_Detector
 %         imshow(RGB);
         try
             centers = Ball_Detector.detectBall(BW, RGB);
-            coords = Ball_Detector.getRealCoord(centers, cam);
+            original_coords = Ball_Detector.getRealCoord(centers, cam);
+            coords = zeros(0);
+            for i = 1:size(original_coords,1)
+                this_coord = original_coords(i,:);
+                if Ball_Detector.checkOnBoard(this_coord)
+                    coords = [coords; this_coord];
+                end
+            end
         catch exception
             getReport(exception);
             disp(["No ball with color ", color]);
@@ -197,6 +204,15 @@ classdef Ball_Detector
 
 
 
+
+    function on_checker = checkOnBoard(coord)
+        x = coord(1);
+        y = coord(2);
+
+        on_checker = 40 < x && x < 160 ...
+                    && -130 < y && y < 130;
+          
+    end
 
 
 
