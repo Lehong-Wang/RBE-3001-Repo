@@ -1,3 +1,4 @@
+
 clear
 clear java
 clear classes;
@@ -20,132 +21,57 @@ myHIDSimplePacketComs.setPid(pid);
 myHIDSimplePacketComs.setVid(vid);
 myHIDSimplePacketComs.connect();
 
-
-% Create a PacketProcessor object to send data to the nucleo firmware
 robot = Robot(myHIDSimplePacketComs); 
-model2 = Model2();
-
-robot.interpolate_jp([47.7263 37.6955 44.7286], 1000);
-pause(1.5)
-
-
-  ifReach = 0;  %set a boolean if Reach the set point 
-  position1 = []; %create an empty matrix to store the data of joints position
-  timeStamp1 = [];
-  jointAngle1 = [];
-  input1 = robot.ik3001([50,55,75]);
-  robot.servo_jp(transpose(input1));  %using function to move arm with interpolate of 1.5s
-  tStart1 = tic;
-  while( ifReach < 1)   %using while loop
-      currentT = robot.measured_cp(); %record current position
-      currentPos = currentT(1:3,4);
-      jointA1 = robot.ik3001(currentPos);
-      tCurr1 = toc(tStart1);
-      position1 = [position1; transpose(currentPos)]; %input position data to matrix
-      timeStamp1 = [timeStamp1; tCurr1];
-      jointAngle1 = [jointAngle1; transpose(jointA1)];
-      if currentT(2,4) >= 55     %if reach the set point, stop the recording
-          ifReach = 1;
-      end
-  end
-
-
-  ifReach = 0;  %set a boolean if Reach the set point 
-  position2 = []; %create an empty matrix to store the data of joints position
-  timeStamp2 = [];
-  jointAngle2 = [];
-  input2 = robot.ik3001([50 0 35]);
-  robot.servo_jp(transpose(input2)); %using function to move arm with interpolate of 1.5s
-  while( ifReach < 1)   %using while loop
-      currentT = robot.measured_cp(); %record current position
-      currentPos = currentT(1:3,4);
-      jointA2 = robot.ik3001(currentPos);
-      tCurr2 = toc(tStart1);
-      position2 = [position2; transpose(currentPos)]; %input position data to matrix
-      timeStamp2 = [timeStamp2; tCurr2];
-      jointAngle2 = [jointAngle2; transpose(jointA2)];
-      if currentT(2,4) <= 0     %if reach the set point, stop the recording
-          ifReach = 1;
-      end
-  end
-
+try
+    SERV_ID = 1848;
+    SERVER_ID_READ =1910;
   
-  ifReach = 0;  %set a boolean if Reach the set point 
-  position3 = []; %create an empty matrix to store the data of joints position
-  timeStamp3 = [];
-  jointAngle3 = [];
-  input3 = robot.ik3001([140 60 90]);
-  robot.servo_jp(transpose(input3));  %using function to move arm with interpolate of 1.5s
-  while( ifReach < 1)   %using while loop
-      currentT = robot.measured_cp(); %record current position
-      currentPos = currentT(1:3,4);
-      jointA3 = robot.ik3001(currentPos);
-      tCurr3 = toc(tStart1);
-      position3 = [position3; transpose(currentPos)]; %input position data to matrix
-      timeStamp3 = [timeStamp3; tCurr3];
-      jointAngle3 = [jointAngle3; transpose(jointA3)];
-      if currentT(2,4) >= 60     %if reach the set point, stop the recording
-          ifReach = 1;
-      end
-  end
+%     robot.servo_jp([30 0 0]);
+% 
+%     tar_0 = [100; 0; 195];
+%     tar_1 = [70; 100; 20];
+%     tar_2 = [70; -100; 40];
+% 
+%     tar = [tar_0 tar_1 tar_2 tar_0];
 
-  
-  ifReach = 0;  %set a boolean if Reach the set point 
-  position4 = []; %create an empty matrix to store the data of joints position
-  timeStamp4 = [];
-  jointAngle4 = [];
-  robot.servo_jp(transpose(input1));  %using function to move arm with interpolate of 1.5s
-  while( ifReach < 1)   %using while loop
-      currentT = robot.measured_cp(); %record current position
-      currentPos = currentT(1:3,4);
-      jointA4 = robot.ik3001(currentPos);
-      tCurr4 = toc(tStart1);
-      position4 = [position4; transpose(currentPos)]; %input position data to matrix
-      timeStamp4 = [timeStamp4; tCurr4];
-      jointAngle4 = [jointAngle4; transpose(jointA4)];
-      if currentT(2,4) <= 55      %if reach the set point, stop the recording
-          ifReach = 1;
-      end
-  end
+    % record_mat = robot.run_trajectory(tar, 2)
+%     robot.servo_jp([40,60,80]);
+%     pause(0.5);
 
-  positionT = [position1;position2;position3;position4];
-  timeT = [timeStamp1; timeStamp2; timeStamp3; timeStamp4];
-  jointT = [jointAngle1; jointAngle2; jointAngle3; jointAngle4];
-  
-figure
-plot(timeT,positionT(:,1))
-hold on
-plot(timeT,positionT(:,2))
-hold on
-plot(timeT,positionT(:,3))
-title("Position VS Time")
-xlabel("Time(ms)");
-ylabel("Position(mm)");
-xlabel("Time(s)");
-legend('X','Y','Z');
-hold off;
+    robot.run_trajectory([100;0;195],1)
+    pause;
 
-figure
-plot(timeT,jointT(:,1))
-hold on
-plot(timeT,jointT(:,2))
-hold on
-plot(timeT,jointT(:,3))
-title("Joint Angles VS Time");
-xlabel("Time(s)");
-ylabel("Joint Angle(degree)");
-legend('Joint1','Joint2','Joint3');
-hold off;
+    record_mat = robot.run_function_trajectory(@Traj_Planner.verticle_half_circle ,-150, 150, 10, true)
 
-figure
-plot3(positionT(:,1),positionT(:,2),positionT(:,3))
-title("3D Position Trajectory");
-xlabel('X-Position');
-ylabel('Y-Position');
-zlabel('Z-Position');
-writematrix(positionT,'positionArray.csv')
+%     robot.plot_record(record_mat)
 
-% Clear up memory upon termination
+
+    % time_vector = record_mat(:,1);
+    % x_vector = record_mat(:,2);
+    % y_vector = record_mat(:,3);
+    % z_vector = record_mat(:,4);
+
+    % plot3(x_vector, y_vector, z_vector);
+    % axis([-100 200 -200 200 0 300]);
+
+
+
+
+
+
+
+
+
+    
+ 
+
+
+
+
+
+catch exception
+    getReport(exception)
+    disp('Exited on error, clean shutdown');
+end
+
 robot.shutdown()
-
-%toc

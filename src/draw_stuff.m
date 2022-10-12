@@ -23,30 +23,22 @@ myHIDSimplePacketComs.connect();
 
 robot = Robot(myHIDSimplePacketComs); 
 try
-    SERV_ID = 1848;
-    SERVER_ID_READ =1910;
-  
-%   a = robot.measured_js(1,1)
-%   b = robot.measured_cp()
-%   robot.servo_jp([40,50,-20]);
-%   c = robot.setpoint_js()
-%   d = robot.setpoint_cp()
-%   e = robot.goal_cp()
+    global end_effector_T;
 
+    robot.run_trajectory([100;0;195], 1);
+    disp("Place the Marker");
+    pause;
+    robot.run_trajectory([125;-45;40], 2);
+    record1 = robot.run_function_trajectory(@Traj_Planner.draw_heart_upper, -45, 45, 5, false);
+    record2 = robot.run_function_trajectory(@Traj_Planner.draw_heart_lower, 45, -45, 5, false);
 
-    [make_plot, plot_pos, plot_arm] = Model;
+    record = [record1; record2];
 
-    make_plot();
-    for i = (1:1000)
-        t_mat = robot.get_all_trans_mat()
-        plot_arm(t_mat)
-        pause(.1);
-    end
+    robot.plot_record(record);
 
+    robot.run_trajectory([125;-45;40], 1);
+    robot.run_trajectory([100;0;195], 2);
 
-
-    
- 
 
 
 
